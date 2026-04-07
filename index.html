@@ -8,272 +8,371 @@
 <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 
 <style>
-body { margin: 0; font-family: Arial; background: #e6f2ff; }
+body { margin:0; font-family:Arial; background:#e6f2ff; }
 
 .navbar {
-display: flex;
-justify-content: space-between;
-padding: 10px 20px;
-background: white;
-box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+display:flex; justify-content:space-between; align-items:center;
+padding:10px 20px; background:white;
+box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
-.logo {
-display: flex;
-align-items: center;
-gap: 10px;
-font-size: 22px;
-font-weight: bold;
+.menu-btn { font-size:25px; cursor:pointer; color:skyblue; }
+
+.cam-icon{
+background:none;
+font-size:20px;
+margin-left:10px;
+cursor:pointer;
 }
 
-.logo span { color: black; }
+.logo { display:flex; align-items:center; gap:10px; font-weight:bold; }
 
-.logo img {
-height: 35px;
-width: 35px;
-object-fit: contain;
-filter: invert(62%) sepia(97%) saturate(500%) hue-rotate(180deg);
+.sidebar {
+position:fixed; top:0; left:0; width:260px; height:100%;
+background:skyblue; padding:20px;
+transform:translateX(-100%); transition:0.3s; z-index:1001;
+}
+
+.sidebar.active { transform:translateX(0); }
+
+.overlay {
+position:fixed; top:0; left:0; width:100%; height:100%;
+background:rgba(0,0,0,0.3); display:none; z-index:1000;
+}
+
+.sidebar button,.sidebar input {
+width:100%; margin:10px 0; padding:8px; border:none; border-radius:5px;
 }
 
 .upload-box {
-background: white;
-padding: 15px;
-margin: 15px;
-border-radius: 10px;
-display: flex;
-gap: 10px;
-flex-wrap: wrap;
+background:white; padding:15px; margin:15px;
+border-radius:10px; display:flex; flex-direction:column; gap:10px;
+}
+
+.camera-panel {
+background:#f5fbff; padding:10px; border-radius:10px;
+display:none;
+}
+
+.camera-controls {
+display:flex;
+flex-wrap:nowrap;
+overflow-x:auto;
+gap:8px;
+margin-top:10px;
+}
+
+.camera-controls button {
+flex:0 0 auto;
+min-width:70px;
 }
 
 .container {
-display: grid;
-grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-gap: 15px;
-padding: 20px;
+display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px; padding:20px;
 }
 
-.video {
-background: white;
-padding: 10px;
-border-radius: 10px;
-}
+.video { background:white; padding:10px; border-radius:10px; }
 
-video, img {
-width: 100%;
-border-radius: 10px;
-background: black;
-}
+video,img { width:100%; border-radius:10px; }
 
 button {
-margin: 3px;
-padding: 6px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-background: skyblue;
-color: black;
+padding:6px; border:none; border-radius:5px;
+cursor:pointer; background:skyblue;
 }
-
-button:hover { opacity: 0.8; }
 </style>
 </head>
 
 <body>
 
 <div class="navbar">
+<div style="display:flex; align-items:center;">
+<div class="menu-btn" onclick="openMenu()">☰</div>
+
+<!-- ✅ CAMERA ICON HERE -->
+<button onclick="toggleCameraPanel()" class="cam-icon">📷</button>
+
+</div>
+
 <div class="logo">
-<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
+<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" style="height:35px">
 <span>🅼🄾🆅🄸🄱🄴</span>
 </div>
+</div>
 
-<a href="https://www.amazon.in" target="_blank">
-<button>🛒 Shop</button>
-</a>
+<div class="sidebar" id="sidebar">
+<h3>Menu</h3>
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
+<p id="userInfo"></p>
+
+<hr>
+
+<input type="text" id="shopLink" placeholder="Enter shop link">
+<button onclick="addShop()">Add Link</button>
+
+<button onclick="closeMenu()">❌ Close</button>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<div class="upload-box">
+
+<input type="text" id="videoName" placeholder="Video Name">
+<button onclick="uploadVideo()">Upload</button>
+
+<!-- ❌ CAMERA BUTTON REMOVED FROM HERE -->
+
+<div class="camera-panel" id="cameraPanel">
+
+<div id="cameraPreview"></div>
+
+<div class="camera-controls">
+<button id="cameraBtn" onclick="toggleCamera()">📷 ON/OFF</button>
+<button onclick="switchCamera()">🔄 Switch</button>
+<button onclick="toggleFlash()">🔦 Flash</button>
+<button onclick="toggleMic()" id="micBtn">🎤 Mic OFF</button>
+<button onclick="capturePhoto()">📸 Photo</button>
+<button onclick="startRecording()">🎥 Record</button>
+</div>
+
+<button onclick="stopRecording()">⏹ Stop</button>
 
 </div>
 
-<div class="upload-box">
-<input type="text" id="videoName" placeholder="Video Name">
-<button onclick="uploadVideo()">Upload</button>
-<button onclick="openCamera()">📷 Camera</button>
-<button onclick="stopCamera()">❌ Stop</button>
 </div>
 
 <div class="container" id="videoContainer"></div>
 
 <script>
 
-// ✅ SUPABASE
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const videoContainer = document.getElementById("videoContainer");
+
+function openMenu(){
+sidebar.classList.add("active");
+overlay.style.display="block";
+}
+function closeMenu(){
+sidebar.classList.remove("active");
+overlay.style.display="none";
+}
+
+function toggleCameraPanel(){
+let panel=document.getElementById("cameraPanel");
+panel.style.display = panel.style.display==="none"?"block":"none";
+}
+
 const supabaseClient = window.supabase.createClient(
 "https://wivkaloxlsibjjgtudps.supabase.co",
 "sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg"
 );
 
-// 📷 CAMERA CONTROL
-let cameraStream = null;
+async function login(){
+await supabaseClient.auth.signInWithOAuth({provider:"google"});
+}
+async function logout(){
+await supabaseClient.auth.signOut();
+location.reload();
+}
 
-async function openCamera() {
-try {
-cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+supabaseClient.auth.getUser().then(({data})=>{
+if(data.user){ document.getElementById("userInfo").innerText=data.user.email; }
+});
 
-let video = document.createElement("video");
-video.srcObject = cameraStream;
-video.autoplay = true;
-video.controls = true;
+function addShop(){
+let link=document.getElementById("shopLink").value.trim();
+if(!link) return;
 
-document.getElementById("videoContainer").prepend(video);
+if(!link.startsWith("http")) link="https://"+link;
 
-} catch {
-alert("Camera access denied ❌");
+let preview=`https://api.microlink.io/?url=${link}`;
+
+videoContainer.innerHTML+=`
+<div class="video">
+<img src="${preview}">
+<p>${link}</p>
+<a href="${link}" target="_blank"><button>Open</button></a>
+</div>`;
+}
+
+let cameraStream=null;
+let mediaRecorder;
+let recordedChunks=[];
+let currentFacing="user";
+let flashOn=false;
+let micOn=false;
+
+async function toggleCamera(){
+let preview=document.getElementById("cameraPreview");
+
+if(!cameraStream){
+cameraStream=await navigator.mediaDevices.getUserMedia({
+video:{ facingMode: currentFacing }
+});
+
+let v=document.createElement("video");
+v.id="liveCamera";
+v.srcObject=cameraStream;
+v.autoplay=true;
+
+preview.innerHTML="";
+preview.appendChild(v);
+
+}else{
+cameraStream.getTracks().forEach(t=>t.stop());
+cameraStream=null;
+preview.innerHTML="";
 }
 }
 
-function stopCamera() {
+async function switchCamera(){
+currentFacing = currentFacing==="user"?"environment":"user";
+
 if(cameraStream){
-cameraStream.getTracks().forEach(track => track.stop());
-cameraStream = null;
-alert("Camera बंद हो गया ✅");
+cameraStream.getTracks().forEach(t=>t.stop());
+cameraStream=null;
+toggleCamera();
 }
 }
 
-// 🚀 UPLOAD
-function uploadVideo() {
-let name = document.getElementById("videoName").value.trim();
+async function toggleFlash(){
+if(!cameraStream) return alert("Camera ON karo");
 
-if(name===""){
-alert("Video name डालो");
-return;
+let track=cameraStream.getVideoTracks()[0];
+let cap=track.getCapabilities();
+
+if(!cap.torch){
+return alert("Flash support nahi hai");
 }
 
-cloudinary.openUploadWidget({
-cloudName: "dvks0ojbu",
-uploadPreset: "latw_preset",
-resourceType: "auto"
-}, async (error, result) => {
+flashOn=!flashOn;
 
-if (!error && result && result.event === "success") {
+await track.applyConstraints({
+advanced:[{torch:flashOn}]
+});
+}
 
-let url = result.info.secure_url;
-let type = result.info.resource_type; // 🔥 FIX
+function toggleMic(){
+micOn=!micOn;
+document.getElementById("micBtn").innerText = micOn ? "🎤 Mic ON" : "🎤 Mic OFF";
+}
 
-await supabaseClient.from("videos").insert([
-{ title: name, url: url, type: type, likes: 0, views: 0 }
+async function capturePhoto(){
+if(!cameraStream) return alert("Camera ON karo");
+
+let video=document.getElementById("liveCamera");
+
+let canvas=document.createElement("canvas");
+canvas.width=video.videoWidth;
+canvas.height=video.videoHeight;
+
+canvas.getContext("2d").drawImage(video,0,0);
+
+let blob=await (await fetch(canvas.toDataURL())).blob();
+
+let fd=new FormData();
+fd.append("file",blob);
+fd.append("upload_preset","latw_preset");
+
+let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});
+let data=await res.json();
+
+await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image"}]);
+
+loadVideos();
+}
+
+function startRecording(){
+if(!cameraStream) return alert("Camera ON karo");
+
+recordedChunks=[];
+
+if(micOn){
+navigator.mediaDevices.getUserMedia({audio:true}).then(audioStream=>{
+let combined=new MediaStream([
+...cameraStream.getVideoTracks(),
+...audioStream.getAudioTracks()
 ]);
 
+mediaRecorder=new MediaRecorder(combined);
+startRec();
+});
+}else{
+mediaRecorder=new MediaRecorder(cameraStream);
+startRec();
+}
+
+function startRec(){
+mediaRecorder.ondataavailable=e=>{
+if(e.data.size>0) recordedChunks.push(e.data);
+};
+
+mediaRecorder.onstop=async ()=>{
+let blob=new Blob(recordedChunks,{type:"video/webm"});
+
+let fd=new FormData();
+fd.append("file",blob);
+fd.append("upload_preset","latw_preset");
+
+let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});
+let data=await res.json();
+
+await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video"}]);
+
 loadVideos();
-document.getElementById("videoName").value = "";
+};
+
+mediaRecorder.start();
+alert("Recording start");
+}
+}
+
+function stopRecording(){
+if(mediaRecorder){
+mediaRecorder.stop();
+alert("Uploading...");
+}
+}
+
+function uploadVideo(){
+let name=document.getElementById("videoName").value;
+
+cloudinary.openUploadWidget({
+cloudName:"dvks0ojbu",
+uploadPreset:"latw_preset"
+},async(e,r)=>{
+if(r && r.event==="success"){
+await supabaseClient.from("videos").insert([{
+title:name,
+url:r.info.secure_url,
+type:r.info.resource_type
+}]);
+
+loadVideos();
 }
 });
 }
 
-// 📥 LOAD
-async function loadVideos() {
+async function loadVideos(){
+let {data}=await supabaseClient.from("videos").select("*");
 
-let container = document.getElementById("videoContainer");
-container.innerHTML = "Loading...";
+videoContainer.innerHTML="";
 
-const { data } = await supabaseClient
-.from("videos")
-.select("*")
-.order("id", { ascending: false });
+data.forEach(v=>{
+let media=v.type==="video"
+? `<video controls src="${v.url}"></video>`
+: `<img src="${v.url}">`;
 
-container.innerHTML = "";
-
-data.forEach(v => {
-
-let media;
-
-// 🔥 PERFECT DETECTION
-if(v.type === "video"){
-media = `
-<video controls onclick="addView(${v.id})">
-<source src="${v.url}">
-</video>`;
-} else {
-media = `<img src="${v.url}" onclick="addView(${v.id})">`;
-}
-
-container.innerHTML += `
+videoContainer.innerHTML+=`
 <div class="video">
-
 ${media}
-
-<div>${v.title}</div>
-
-<button onclick="skip(this,-10)">⏪</button>
-<button onclick="skip(this,10)">⏩</button>
-<button onclick="replay(this)">🔄</button>
-<button onclick="likeVideo(${v.id},${v.likes})">👍</button>
-<button onclick="fullscreenVideo(this)">⛶</button>
-
-<p>👁 ${v.views} | 👍 ${v.likes}</p>
-
-</div>
-`;
+<p>${v.title}</p>
+</div>`;
 });
 }
 
-// 👍 LIKE
-async function likeVideo(id, likes) {
-
-if(localStorage.getItem("liked_"+id)) return;
-
-localStorage.setItem("liked_"+id, true);
-
-await supabaseClient.from("videos")
-.update({ likes: likes + 1 })
-.eq("id", id);
-
-loadVideos();
-}
-
-// 👁 VIEW
-function addView(id) {
-
-if(sessionStorage.getItem("viewed_"+id)) return;
-
-sessionStorage.setItem("viewed_"+id, true);
-
-supabaseClient.from("videos")
-.select("*")
-.eq("id", id)
-.single()
-.then(({data})=>{
-supabaseClient.from("videos")
-.update({ views: data.views + 1 })
-.eq("id", id)
-.then(()=> loadVideos());
-});
-}
-
-// 🎮 CONTROLS
-function skip(btn, sec) {
-let video = btn.closest(".video").querySelector("video");
-if(video) video.currentTime += sec;
-}
-
-function replay(btn) {
-let video = btn.closest(".video").querySelector("video");
-if(video){
-video.currentTime = 0;
-video.play();
-}
-}
-
-// 🔥 FULLSCREEN
-function fullscreenVideo(btn) {
-let video = btn.closest(".video").querySelector("video");
-
-if (!video) return;
-
-if (document.fullscreenElement) {
-document.exitFullscreen();
-} else {
-video.requestFullscreen();
-}
-}
-
-// LOAD
 loadVideos();
 
 </script>
