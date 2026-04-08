@@ -1,289 +1,311 @@
-<!DOCTYPE html>        
-<html>        
-<head>        
-<meta name="viewport" content="width=device-width, initial-scale=1.0">        
-<title>🅼🄾🆅🄸🄱🄴</title>        
-        
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>        
-<script src="https://upload-widget.cloudinary.com/global/all.js"></script>        
-        
-<style>        
-body { margin:0; font-family:Arial; background:#e6f2ff; }        
-
-/* 🔐 LOGIN SCREEN */
-#authScreen{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:white;
+<!DOCTYPE html>            
+<html>            
+<head>            
+<meta name="viewport" content="width=device-width, initial-scale=1.0">            
+<title>🅼🄾🆅🄸🄱🄴</title>            
+            
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>            
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>            
+            
+<style>            
+body { margin:0; font-family:Arial; background:#e6f2ff; }            
+    
+#authScreen{    
+position:fixed;    
+top:0;    
+left:0;    
+width:100%;    
+height:100%;    
+background:white;    
+display:flex;    
+justify-content:center;    
+align-items:center;    
+flex-direction:column;    
+z-index:9999;    
+}    
+    
+.auth-box{    
+background:#f5fbff;    
+padding:30px;    
+border-radius:10px;    
+text-align:center;    
+}    
+    
+.navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); }            
+.menu-btn { font-size:25px; cursor:pointer; color:skyblue; }            
+.cam-icon{ background:none; font-size:20px; margin-left:10px; cursor:pointer; }            
+.logo { display:flex; align-items:center; gap:10px; font-weight:bold; }            
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:skyblue; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; }            
+.sidebar.active { transform:translateX(0); }            
+.overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); display:none; z-index:1000; }            
+.sidebar button,.sidebar input { width:100%; margin:10px 0; padding:8px; border:none; border-radius:5px; }            
+.upload-box { background:white; padding:15px; margin:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; }            
+.camera-panel { background:#f5fbff; padding:10px; border-radius:10px; display:none; }            
+.camera-controls { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin-top:10px; }            
+.camera-controls button { flex:0 0 auto; min-width:70px; }            
+.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; padding:20px; }            
+.video { background:white; padding:10px; border-radius:10px; }            
+video,img { width:100%; border-radius:10px; }            
+    
+/* 🔥 NEW BUTTON DESIGN (IMAGE STYLE) */
+button {
 display:flex;
-justify-content:center;
 align-items:center;
-flex-direction:column;
-z-index:9999;
+gap:10px;
+padding:10px 15px;
+border:none;
+border-radius:50px;
+background:#2fa58d;
+color:white;
+font-weight:bold;
+cursor:pointer;
+box-shadow:0 4px 10px rgba(0,0,0,0.15);
+transition:0.3s;
 }
 
-.auth-box{
-background:#f5fbff;
-padding:30px;
-border-radius:10px;
-text-align:center;
+button::before{
+content:"➤";
+background:white;
+color:#2fa58d;
+width:30px;
+height:30px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:14px;
 }
 
-.navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); }        
-.menu-btn { font-size:25px; cursor:pointer; color:skyblue; }        
-.cam-icon{ background:none; font-size:20px; margin-left:10px; cursor:pointer; }        
-.logo { display:flex; align-items:center; gap:10px; font-weight:bold; }        
-.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:skyblue; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; }        
-.sidebar.active { transform:translateX(0); }        
-.overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); display:none; z-index:1000; }        
-.sidebar button,.sidebar input { width:100%; margin:10px 0; padding:8px; border:none; border-radius:5px; }        
-.upload-box { background:white; padding:15px; margin:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; }        
-.camera-panel { background:#f5fbff; padding:10px; border-radius:10px; display:none; }        
-.camera-controls { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin-top:10px; }        
-.camera-controls button { flex:0 0 auto; min-width:70px; }        
-.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; padding:20px; }        
-.video { background:white; padding:10px; border-radius:10px; }        
-video,img { width:100%; border-radius:10px; }        
-button { padding:6px; border:none; border-radius:5px; cursor:pointer; background:skyblue; }        
-</style>        
-</head>        
-
-<body>        
-
-<!-- 🔐 AUTH SCREEN -->
-<div id="authScreen">
-  <div class="auth-box">
-    <h2>Login Required</h2>
-    <button onclick="login()">Login with Google</button>
-  </div>
-</div>
-
-<div class="navbar">        
-<div style="display:flex; align-items:center;">        
-<div class="menu-btn" onclick="openMenu()">☰</div>        
-<button onclick="toggleCameraPanel()" class="cam-icon">📷</button>        
-</div>        
-        
-<div class="logo">        
-<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" style="height:35px">        
-<span>🅼🄾🆅🄸🄱🄴</span>        
-</div>        
-</div>        
-        
-<div class="sidebar" id="sidebar">        
-<h3>Menu</h3>        
-<button onclick="logout()">Logout</button>        
-<p id="userInfo"></p>        
-<hr>        
-<input type="text" id="shopLink" placeholder="Enter shop link">        
-<button onclick="addShop()">Add Link</button>        
-<button onclick="closeMenu()">❌ Close</button>        
-</div>        
-        
-<div class="overlay" id="overlay" onclick="closeMenu()"></div>        
-        
-<div class="upload-box">        
-<input type="text" id="videoName" placeholder="Video Name">        
-<button onclick="uploadVideo()">Upload</button>        
-        
-<div class="camera-panel" id="cameraPanel">        
-<div id="cameraPreview"></div>        
-<div class="camera-controls">        
-<button id="cameraBtn" onclick="toggleCamera()">📷 ON/OFF</button>        
-<button onclick="switchCamera()">🔄 Switch</button>        
-<button onclick="toggleFlash()">🔦 Flash</button>        
-<button onclick="toggleMic()" id="micBtn">🎤 Mic OFF</button>        
-<button onclick="capturePhoto()">📸 Photo</button>        
-<button onclick="startRecording()">🎥 Record</button>        
-</div>        
-<button onclick="stopRecording()">⏹ Stop</button>        
-</div>        
-</div>        
-        
-<div class="container" id="videoContainer"></div>        
-        
-<script>        
-        
-const sidebar = document.getElementById("sidebar");        
-const overlay = document.getElementById("overlay");        
-const videoContainer = document.getElementById("videoContainer");        
-        
-function openMenu(){ sidebar.classList.add("active"); overlay.style.display="block"; }        
-function closeMenu(){ sidebar.classList.remove("active"); overlay.style.display="none"; }        
-        
-function toggleCameraPanel(){        
-let panel=document.getElementById("cameraPanel");        
-panel.style.display = panel.style.display==="none"?"block":"none";        
-}        
-        
-const supabaseClient = window.supabase.createClient(        
-"https://wivkaloxlsibjjgtudps.supabase.co",        
-"sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg"        
-);        
-
-// 🔐 LOGIN
-async function login(){        
-  await supabaseClient.auth.signInWithOAuth({        
-    provider: "google",        
-    options: {        
-      redirectTo: "https://mauntanhills-beep.github.io/movibe"        
-    }        
-  });        
-}        
-
-async function logout(){        
-await supabaseClient.auth.signOut();        
-location.reload();        
-}        
-
-// 🔐 AUTH CHECK
-async function checkUser(){
-  const { data } = await supabaseClient.auth.getUser();
-  if(data.user){
-    document.getElementById("authScreen").style.display="none";
-    document.getElementById("userInfo").innerText=data.user.email;
-    loadVideos();
-  }else{
-    document.getElementById("authScreen").style.display="flex";
-  }
+button:hover{
+background:#248f79;
+transform:scale(1.05);
 }
 
-checkUser();
-
-function addShop(){        
-let link=document.getElementById("shopLink").value.trim();        
-if(!link) return;        
-if(!link.startsWith("http")) link="https://"+link;        
-let preview=`https://api.microlink.io/?url=${link}`;        
-videoContainer.innerHTML+=`        
-<div class="video">        
-<img src="${preview}">        
-<p>${link}</p>        
-<a href="${link}" target="_blank"><button>Open</button></a>        
-</div>`;        
-}        
-
-let cameraStream=null;        
-let mediaRecorder;        
-let recordedChunks=[];        
-let currentFacing="user";        
-let flashOn=false;        
-let micOn=false;        
-
-async function toggleCamera(){        
-let preview=document.getElementById("cameraPreview");        
-if(!cameraStream){        
-cameraStream=await navigator.mediaDevices.getUserMedia({video:{ facingMode: currentFacing }});        
-let v=document.createElement("video");        
-v.id="liveCamera";        
-v.srcObject=cameraStream;        
-v.autoplay=true;        
-preview.innerHTML="";        
-preview.appendChild(v);        
-}else{        
-cameraStream.getTracks().forEach(t=>t.stop());        
-cameraStream=null;        
-preview.innerHTML="";        
-}        
-}        
-
-async function switchCamera(){        
-currentFacing = currentFacing==="user"?"environment":"user";        
-if(cameraStream){        
-cameraStream.getTracks().forEach(t=>t.stop());        
-cameraStream=null;        
-toggleCamera();        
-}        
-}        
-
-async function toggleFlash(){        
-if(!cameraStream) return alert("Camera ON karo");        
-let track=cameraStream.getVideoTracks()[0];        
-let cap=track.getCapabilities();        
-if(!cap.torch){ return alert("Flash support nahi hai"); }        
-flashOn=!flashOn;        
-await track.applyConstraints({advanced:[{torch:flashOn}]});        
-}        
-
-function toggleMic(){        
-micOn=!micOn;        
-document.getElementById("micBtn").innerText = micOn ? "🎤 Mic ON" : "🎤 Mic OFF";        
-}        
-
-async function capturePhoto(){        
-if(!cameraStream) return alert("Camera ON karo");        
-let video=document.getElementById("liveCamera");        
-let canvas=document.createElement("canvas");        
-canvas.width=video.videoWidth;        
-canvas.height=video.videoHeight;        
-canvas.getContext("2d").drawImage(video,0,0);        
-let blob=await (await fetch(canvas.toDataURL())).blob();        
-let fd=new FormData();        
-fd.append("file",blob);        
-fd.append("upload_preset","latw_preset");        
-let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});        
-let data=await res.json();        
-await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image"}]);        
-loadVideos();        
-}        
-
-function startRecording(){        
-if(!cameraStream) return alert("Camera ON karo");        
-recordedChunks=[];        
-if(micOn){        
-navigator.mediaDevices.getUserMedia({audio:true}).then(audioStream=>{        
-let combined=new MediaStream([...cameraStream.getVideoTracks(),...audioStream.getAudioTracks()]);        
-mediaRecorder=new MediaRecorder(combined);        
-startRec();        
-});        
-}else{        
-mediaRecorder=new MediaRecorder(cameraStream);        
-startRec();        
-}        
-function startRec(){        
-mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recordedChunks.push(e.data); };        
-mediaRecorder.onstop=async ()=>{        
-let blob=new Blob(recordedChunks,{type:"video/webm"});        
-let fd=new FormData();        
-fd.append("file",blob);        
-fd.append("upload_preset","latw_preset");        
-let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});        
-let data=await res.json();        
-await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video"}]);        
-loadVideos();        
-};        
-mediaRecorder.start();        
-alert("Recording start");        
-}        
-}        
-
-function stopRecording(){        
-if(mediaRecorder){ mediaRecorder.stop(); alert("Uploading..."); }        
-}        
-
-function uploadVideo(){        
-let name=document.getElementById("videoName").value;        
-cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{        
-if(r && r.event==="success"){        
-await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);        
-loadVideos();        
-}        
-});        
-}        
-
-async function loadVideos(){        
-let {data}=await supabaseClient.from("videos").select("*");        
-videoContainer.innerHTML="";        
-data.forEach(v=>{        
-let media=v.type==="video" ? `<video controls src="${v.url}"></video>` : `<img src="${v.url}">`;        
-videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;        
-});        
-}        
-
-</script>        
-        
-</body>        
-  </html>
+button:active{
+transform:scale(0.95);
+}
+</style>            
+</head>            
+    
+<body>            
+    
+<div id="authScreen">    
+  <div class="auth-box">    
+    <h2>Login Required</h2>    
+    <button onclick="login()">Login with Google</button>    
+  </div>    
+</div>    
+    
+<div class="navbar">            
+<div style="display:flex; align-items:center;">            
+<div class="menu-btn" onclick="openMenu()">☰</div>            
+<button onclick="toggleCameraPanel()" class="cam-icon">📷</button>            
+</div>            
+            
+<div class="logo">            
+<img src="https://cdn-icons-png.flaticon.com/512/727/727245.png" style="height:35px">            
+<span>🅼🄾🆅🄸🄱🄴</span>            
+</div>            
+</div>            
+            
+<div class="sidebar" id="sidebar">            
+<h3>Menu</h3>            
+<button onclick="logout()">Logout</button>            
+<p id="userInfo"></p>            
+<hr>            
+<input type="text" id="shopLink" placeholder="Enter shop link">            
+<button onclick="addShop()">Add Link</button>            
+<button onclick="closeMenu()">❌ Close</button>            
+</div>            
+            
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>            
+            
+<div class="upload-box">            
+<input type="text" id="videoName" placeholder="Video Name">            
+<button onclick="uploadVideo()">Upload</button>            
+            
+<div class="camera-panel" id="cameraPanel">            
+<div id="cameraPreview"></div>            
+<div class="camera-controls">            
+<button id="cameraBtn" onclick="toggleCamera()">📷 ON/OFF</button>            
+<button onclick="switchCamera()">🔄 Switch</button>            
+<button onclick="toggleFlash()">🔦 Flash</button>            
+<button onclick="toggleMic()" id="micBtn">🎤 Mic OFF</button>            
+<button onclick="capturePhoto()">📸 Photo</button>            
+<button onclick="startRecording()">🎥 Record</button>            
+</div>            
+<button onclick="stopRecording()">⏹ Stop</button>            
+</div>            
+</div>            
+            
+<div class="container" id="videoContainer"></div>            
+            
+<script>            
+            
+const sidebar = document.getElementById("sidebar");            
+const overlay = document.getElementById("overlay");            
+const videoContainer = document.getElementById("videoContainer");            
+            
+function openMenu(){ sidebar.classList.add("active"); overlay.style.display="block"; }            
+function closeMenu(){ sidebar.classList.remove("active"); overlay.style.display="none"; }            
+            
+function toggleCameraPanel(){            
+let panel=document.getElementById("cameraPanel");            
+panel.style.display = panel.style.display==="none"?"block":"none";            
+}            
+            
+const supabaseClient = window.supabase.createClient(            
+"https://wivkaloxlsibjjgtudps.supabase.co",            
+"sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg"            
+);            
+            
+async function login(){            
+  await supabaseClient.auth.signInWithOAuth({            
+    provider: "google",            
+    options: {            
+      redirectTo: "https://mauntanhills-beep.github.io/movibe"            
+    }            
+  });            
+}            
+            
+async function logout(){            
+await supabaseClient.auth.signOut();            
+location.reload();            
+}            
+            
+async function checkUser(){    
+  const { data } = await supabaseClient.auth.getUser();    
+  if(data.user){    
+    document.getElementById("authScreen").style.display="none";    
+    document.getElementById("userInfo").innerText=data.user.email;    
+    loadVideos();    
+  }else{    
+    document.getElementById("authScreen").style.display="flex";    
+  }    
+}    
+    
+checkUser();    
+    
+function addShop(){            
+let link=document.getElementById("shopLink").value.trim();            
+if(!link) return;            
+if(!link.startsWith("http")) link="https://"+link;            
+let preview=`https://api.microlink.io/?url=${link}`;            
+videoContainer.innerHTML+=`            
+<div class="video">            
+<img src="${preview}">            
+<p>${link}</p>            
+<a href="${link}" target="_blank"><button>Open</button></a>            
+</div>`;            
+}            
+            
+let cameraStream=null;            
+let mediaRecorder;            
+let recordedChunks=[];            
+let currentFacing="user";            
+let flashOn=false;            
+let micOn=false;            
+            
+async function toggleCamera(){            
+let preview=document.getElementById("cameraPreview");            
+if(!cameraStream){            
+cameraStream=await navigator.mediaDevices.getUserMedia({video:{ facingMode: currentFacing }});            
+let v=document.createElement("video");            
+v.id="liveCamera";            
+v.srcObject=cameraStream;            
+v.autoplay=true;            
+preview.innerHTML="";            
+preview.appendChild(v);            
+}else{            
+cameraStream.getTracks().forEach(t=>t.stop());            
+cameraStream=null;            
+preview.innerHTML="";            
+}            
+}            
+            
+async function switchCamera(){            
+currentFacing = currentFacing==="user"?"environment":"user";            
+if(cameraStream){            
+cameraStream.getTracks().forEach(t=>t.stop());            
+cameraStream=null;            
+toggleCamera();            
+}            
+}            
+            
+async function toggleFlash(){            
+if(!cameraStream) return alert("Camera ON karo");            
+let track=cameraStream.getVideoTracks()[0];            
+let cap=track.getCapabilities();            
+if(!cap.torch){ return alert("Flash support nahi hai"); }            
+flashOn=!flashOn;            
+await track.applyConstraints({advanced:[{torch:flashOn}]});            
+}            
+            
+function toggleMic(){            
+micOn=!micOn;            
+document.getElementById("micBtn").innerText = micOn ? "🎤 Mic ON" : "🎤 Mic OFF";            
+}            
+            
+async function capturePhoto(){            
+if(!cameraStream) return alert("Camera ON karo");            
+let video=document.getElementById("liveCamera");            
+let canvas=document.createElement("canvas");            
+canvas.width=video.videoWidth;            
+canvas.height=video.videoHeight;            
+canvas.getContext("2d").drawImage(video,0,0);            
+let blob=await (await fetch(canvas.toDataURL())).blob();            
+let fd=new FormData();            
+fd.append("file",blob);            
+fd.append("upload_preset","latw_preset");            
+let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});            
+let data=await res.json();            
+await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image"}]);            
+loadVideos();            
+}            
+            
+function startRecording(){            
+if(!cameraStream) return alert("Camera ON karo");            
+recordedChunks=[];            
+mediaRecorder=new MediaRecorder(cameraStream);            
+mediaRecorder.ondataavailable=e=>{ if(e.data.size>0) recordedChunks.push(e.data); };            
+mediaRecorder.onstop=async ()=>{            
+let blob=new Blob(recordedChunks,{type:"video/webm"});            
+let fd=new FormData();            
+fd.append("file",blob);            
+fd.append("upload_preset","latw_preset");            
+let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});            
+let data=await res.json();            
+await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video"}]);            
+loadVideos();            
+};            
+mediaRecorder.start();            
+alert("Recording start");            
+}            
+            
+function stopRecording(){            
+if(mediaRecorder){ mediaRecorder.stop(); alert("Uploading..."); }            
+}            
+            
+function uploadVideo(){            
+let name=document.getElementById("videoName").value;            
+cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{            
+if(r && r.event==="success"){            
+await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);            
+loadVideos();            
+}            
+});            
+}            
+            
+async function loadVideos(){            
+let {data}=await supabaseClient.from("videos").select("*");            
+videoContainer.innerHTML="";            
+data.forEach(v=>{            
+let media=v.type==="video" ? `<video controls src="${v.url}"></video>` : `<img src="${v.url}">`;            
+videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;            
+});            
+}            
+            
+</script>            
+            
+</body>            
+</html>
