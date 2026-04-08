@@ -87,4 +87,4 @@ function uploadVideo(){let name=document.getElementById("videoName").value;cloud
 async function loadVideos(){let{data}=await supabaseClient.from("videos").select("*");videoContainer.innerHTML="";data.forEach(v=>{let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;});}
 </script>              
 </body>              
-    </html>
+  </html>
