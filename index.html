@@ -1,213 +1,219 @@
-<!DOCTYPE html>                    
-<html>                    
-<head>                    
-<meta name="viewport" content="width=device-width, initial-scale=1.0">                    
-<title>🅼🄾🆅🄸🄱🄴</title>                    
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>                    
-<script src="https://upload-widget.cloudinary.com/global/all.js"></script>                    
-
-<style>                    
-body { margin:0; font-family:Arial; background:#e6f2ff; }                    
-#authScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;}        
-.auth-box{background:#f5fbff;padding:30px;border-radius:10px;text-align:center;}        
-.navbar {display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:white;box-shadow:0 2px 5px rgba(0,0,0,0.1);}                
-.logo {font-weight:bold;}                
-.upload-box {background:white;padding:15px;margin:15px;border-radius:10px;}                
-.container {display:flex;flex-direction:column;gap:20px;padding:10px;max-width:500px;margin:auto;}
-.video {background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
-.post-header {display:flex;justify-content:space-between;align-items:center;padding:10px;}
-.post-actions {display:flex;gap:10px;padding:10px;}
-video,img {width:100%;}
-button {padding:8px 12px;border:none;border-radius:20px;background:#2fa58d;color:white;cursor:pointer;}
-.like-active{background:red;}
-.delete-btn{background:#ff4d4d;}
-.reel{height:90vh;display:flex;flex-direction:column;justify-content:center;}
-</style>                    
-</head>                    
-
-<body>                    
-
-<div id="authScreen">
-<div class="auth-box">
-<h2>Login Required</h2>
-<button onclick="login()">Login with Google</button>
-</div>
-</div>        
-
-<div class="navbar">                    
-<span class="logo">🅼🄾🆅🄸🄱🄴</span>
-<button onclick="toggleReels()">🎬 Reels</button>
-</div>                
-
-<div class="upload-box">                    
-<input type="text" id="videoName" placeholder="Video Name">                    
-<button onclick="uploadVideo()">Upload</button>                
-</div>                
-
-<div class="container" id="videoContainer"></div>                
-
-<script>                
-
-const supabaseClient=window.supabase.createClient(
-"https://wivkaloxlsibjjgtudps.supabase.co",
-"sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg"
-);
-
-let currentUser=null;
-let reelsMode=false;
-
-/* LOGIN */
-async function login(){
-await supabaseClient.auth.signInWithOAuth({
-provider:"google",
-options:{redirectTo:"https://mauntanhills-beep.github.io/movibe"}
-});
-}
-
-/* USER */
-async function checkUser(){
-const{data}=await supabaseClient.auth.getUser();
-if(data.user){
-currentUser=data.user;
-document.getElementById("authScreen").style.display="none";
-loadVideos();
-}
-}
-checkUser();
-
-/* UPLOAD */
-function uploadVideo(){
-let name=document.getElementById("videoName").value;
-cloudinary.openUploadWidget({
-cloudName:"dvks0ojbu",
-uploadPreset:"latw_preset"
-},async(e,r)=>{
-if(r && r.event==="success"){
-await supabaseClient.from("videos").insert([{
-title:name,
-url:r.info.secure_url,
-public_id:r.info.public_id,
-type:r.info.resource_type,
-user_id: currentUser.id
-}]);
-loadVideos();
-}
-});
-}
-
-/* LIKE */
-async function toggleLike(videoId){
-const { data } = await supabaseClient
+<!DOCTYPE html>                        
+<html>                        
+<head>                        
+<meta name="viewport" content="width=device-width, initial-scale=1.0">                        
+<title>🅼🄾🆅🄸🄱🄴</title>                        
+    
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>                        
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>                        
+    
+<style>                        
+body { margin:0; font-family:Arial; background:#e6f2ff; }                        
+#authScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;}            
+.auth-box{background:#f5fbff;padding:30px;border-radius:10px;text-align:center;}            
+.navbar {display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:white;box-shadow:0 2px 5px rgba(0,0,0,0.1);}                    
+.logo {font-weight:bold;}                    
+.upload-box {background:white;padding:15px;margin:15px;border-radius:10px;}                    
+.container {display:flex;flex-direction:column;gap:20px;padding:10px;max-width:500px;margin:auto;}    
+.video {background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.1);}    
+.post-header {display:flex;justify-content:space-between;align-items:center;padding:10px;}    
+.post-actions {display:flex;gap:10px;padding:10px;}    
+video,img {width:100%;}    
+button {padding:8px 12px;border:none;border-radius:20px;background:#2fa58d;color:white;cursor:pointer;}    
+.like-active{background:red;}    
+.delete-btn{background:#ff4d4d;}    
+.reel{height:90vh;display:flex;flex-direction:column;justify-content:center;}    
+.like-count{padding:0 10px;font-size:14px;color:#333;}
+</style>                        
+</head>                        
+    
+<body>                        
+    
+<div id="authScreen">    
+<div class="auth-box">    
+<h2>Login Required</h2>    
+<button onclick="login()">Login with Google</button>    
+</div>    
+</div>            
+    
+<div class="navbar">                        
+<span class="logo">🅼🄾🆅🄸🄱🄴</span>    
+<button onclick="toggleReels()">🎬 Reels</button>    
+</div>                    
+    
+<div class="upload-box">                        
+<input type="text" id="videoName" placeholder="Video Name">                        
+<button onclick="uploadVideo()">Upload</button>                    
+</div>                    
+    
+<div class="container" id="videoContainer"></div>                    
+    
+<script>                    
+    
+const supabaseClient=window.supabase.createClient(    
+"https://wivkaloxlsibjjgtudps.supabase.co",    
+"sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg"    
+);    
+    
+let currentUser=null;    
+let reelsMode=false;    
+    
+async function login(){    
+await supabaseClient.auth.signInWithOAuth({    
+provider:"google",    
+options:{redirectTo:"https://mauntanhills-beep.github.io/movibe"}    
+});    
+}    
+    
+async function checkUser(){    
+const{data}=await supabaseClient.auth.getUser();    
+if(data.user){    
+currentUser=data.user;    
+document.getElementById("authScreen").style.display="none";    
+loadVideos();    
+}    
+}    
+checkUser();    
+    
+function uploadVideo(){    
+let name=document.getElementById("videoName").value;    
+cloudinary.openUploadWidget({    
+cloudName:"dvks0ojbu",    
+uploadPreset:"latw_preset"    
+},async(e,r)=>{    
+if(r && r.event==="success"){    
+await supabaseClient.from("videos").insert([{    
+title:name,    
+url:r.info.secure_url,    
+public_id:r.info.public_id,    
+type:r.info.resource_type,    
+user_id: currentUser.id    
+}]);    
+loadVideos();    
+}    
+});    
+}    
+    
+async function toggleLike(videoId){    
+const { data } = await supabaseClient    
+.from("likes")    
+.select("*")    
+.eq("video_id", videoId)    
+.eq("user_id", currentUser.id);    
+    
+if(data.length){    
+await supabaseClient.from("likes").delete()    
+.eq("video_id", videoId)    
+.eq("user_id", currentUser.id);    
+}else{    
+await supabaseClient.from("likes").insert([{    
+video_id: videoId,    
+user_id: currentUser.id    
+}]);    
+}    
+loadVideos();    
+}    
+    
+async function toggleFollow(userId){    
+const { data } = await supabaseClient    
+.from("followers")    
+.select("*")    
+.eq("follower_id", currentUser.id)    
+.eq("following_id", userId);    
+    
+if(data.length){    
+await supabaseClient.from("followers").delete()    
+.eq("follower_id", currentUser.id)    
+.eq("following_id", userId);    
+}else{    
+await supabaseClient.from("followers").insert([{    
+follower_id: currentUser.id,    
+following_id: userId    
+}]);    
+}    
+loadVideos();    
+}    
+    
+async function openProfile(userId){    
+let { data: posts } = await supabaseClient    
+.from("videos")    
+.select("*")    
+.eq("user_id", userId);    
+    
+videoContainer.innerHTML = `    
+<button onclick="loadVideos()">⬅️ Back</button>    
+${posts.map(v=>`    
+<div class="video">    
+${v.type==="video"    
+? `<video controls src="${v.url}"></video>`    
+: `<img src="${v.url}">`}    
+<p>${v.title}</p>    
+</div>    
+`).join("")}    
+`;    
+}    
+    
+function toggleReels(){    
+reelsMode=!reelsMode;    
+loadVideos();    
+}    
+    
+async function deletePost(id){    
+await supabaseClient.from("videos").delete().eq("id", id);    
+loadVideos();    
+}    
+    
+/* ✅ LIKE COUNT ADDED */
+async function getLikeCount(videoId){
+let { data } = await supabaseClient
 .from("likes")
 .select("*")
-.eq("video_id", videoId)
-.eq("user_id", currentUser.id);
+.eq("video_id", videoId);
 
-if(data.length){
-await supabaseClient.from("likes").delete()
-.eq("video_id", videoId)
-.eq("user_id", currentUser.id);
-}else{
-await supabaseClient.from("likes").insert([{
-video_id: videoId,
-user_id: currentUser.id
-}]);
+return data.length;
 }
-loadVideos();
+    
+async function loadVideos(){    
+let {data}=await supabaseClient.from("videos").select("*");    
+    
+videoContainer.innerHTML="";    
+    
+for (let v of data.reverse()){    
+let media=v.type==="video"    
+? `<video controls src="${v.url}"></video>`    
+: `<img src="${v.url}">`;    
+
+let likeCount = await getLikeCount(v.id);
+    
+videoContainer.innerHTML+=`    
+<div class="video ${reelsMode?'reel':''}">    
+    
+<div class="post-header">    
+<b onclick="openProfile('${v.user_id}')">@User</b>    
+    
+${v.user_id!==currentUser.id    
+? `<button onclick="toggleFollow('${v.user_id}')">Follow</button>`    
+: ""}    
+</div>    
+    
+${media}    
+    
+<div class="post-actions">    
+<button onclick="toggleLike(${v.id})">❤️</button>    
+    
+${v.user_id===currentUser.id    
+? `<button class="delete-btn" onclick="deletePost(${v.id})">🗑️</button>`    
+: ""}    
+</div>    
+
+<div class="like-count">❤️ ${likeCount} likes</div>
+    
+<p>${v.title}</p>    
+    
+</div>`;    
 }
-
-/* FOLLOW */
-async function toggleFollow(userId){
-const { data } = await supabaseClient
-.from("followers")
-.select("*")
-.eq("follower_id", currentUser.id)
-.eq("following_id", userId);
-
-if(data.length){
-await supabaseClient.from("followers").delete()
-.eq("follower_id", currentUser.id)
-.eq("following_id", userId);
-}else{
-await supabaseClient.from("followers").insert([{
-follower_id: currentUser.id,
-following_id: userId
-}]);
-}
-loadVideos();
-}
-
-/* PROFILE */
-async function openProfile(userId){
-let { data: posts } = await supabaseClient
-.from("videos")
-.select("*")
-.eq("user_id", userId);
-
-videoContainer.innerHTML = `
-<button onclick="loadVideos()">⬅️ Back</button>
-${posts.map(v=>`
-<div class="video">
-${v.type==="video"
-? `<video controls src="${v.url}"></video>`
-: `<img src="${v.url}">`}
-<p>${v.title}</p>
-</div>
-`).join("")}
-`;
-}
-
-/* REELS */
-function toggleReels(){
-reelsMode=!reelsMode;
-loadVideos();
-}
-
-/* DELETE */
-async function deletePost(id){
-await supabaseClient.from("videos").delete().eq("id", id);
-loadVideos();
-}
-
-/* LOAD */
-async function loadVideos(){
-let {data}=await supabaseClient.from("videos").select("*");
-
-videoContainer.innerHTML="";
-
-data.reverse().forEach(v=>{
-let media=v.type==="video"
-? `<video controls src="${v.url}"></video>`
-: `<img src="${v.url}">`;
-
-videoContainer.innerHTML+=`
-<div class="video ${reelsMode?'reel':''}">
-
-<div class="post-header">
-<b onclick="openProfile('${v.user_id}')">@User</b>
-
-${v.user_id!==currentUser.id
-? `<button onclick="toggleFollow('${v.user_id}')">Follow</button>`
-: ""}
-</div>
-
-${media}
-
-<div class="post-actions">
-<button onclick="toggleLike(${v.id})">❤️</button>
-
-${v.user_id===currentUser.id
-? `<button class="delete-btn" onclick="deletePost(${v.id})">🗑️</button>`
-: ""}
-</div>
-
-<p>${v.title}</p>
-
-</div>`;
-});
-}
-</script>                
-
-</body>                    
-  </html>
+}    
+</script>                    
+    
+</body>                        
+</html>
