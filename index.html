@@ -15,7 +15,7 @@ body { margin:0; font-family:Arial; background:#e6f2ff; }
 .menu-btn { font-size:25px; cursor:pointer; color:skyblue; }              
 .cam-icon{ background:none; font-size:20px; margin-left:10px; cursor:pointer; }              
 .logo { display:flex; align-items:center; gap:10px; font-weight:bold; }              
-.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:skyblue; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; }              
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:skyblue; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; overflow-y:auto; }              
 .sidebar.active { transform:translateX(0); }              
 .overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); display:none; z-index:1000; }              
 .sidebar button,.sidebar input { width:100%; margin:10px 0; padding:8px; border:none; border-radius:5px; }              
@@ -29,10 +29,25 @@ video,img { width:100%; border-radius:10px; }
 button {display:flex;align-items:center;gap:10px;padding:10px 15px;border:none;border-radius:50px;background:#2fa58d;color:white;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.15);transition:0.3s;}  
 button::before{content:"➤";background:white;color:#2fa58d;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}  
 button:hover{background:#248f79;transform:scale(1.05);}  
-button:active{transform:scale(0.95);}  
+button:active{transform:scale(0.95);}
+.profile-pic-wrapper{display:flex;flex-direction:column;align-items:center;margin:15px 0 5px;}
+.profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
+.profile-circle img{width:100%;height:100%;object-fit:cover;}
+.profile-label{color:white;font-size:11px;margin-top:5px;}
+.profile-input-box{display:flex;align-items:center;background:#1a1a1a;border-radius:8px;margin:6px 0;padding:4px 10px;}
+.profile-input-box span{font-size:18px;margin-right:8px;}
+.profile-input-box input{background:transparent;border:none;outline:none;color:white;width:100%;font-size:14px;padding:6px 0;}
+.profile-input-box input::placeholder{color:#aaa;}
 </style>              
 </head>              
-<body>              
+<body>
+
+<script>
+if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
+  document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#fff;text-align:center;padding:20px;font-family:Arial;"><h2>⚠️ Browser Not Supported</h2><p>Google Login ke liye Chrome mein kholo</p><a href="intent://mauntanhills-beep.github.io/movibe#Intent;scheme=https;package=com.android.chrome;end"><button style="margin-top:15px;background:#2fa58d;color:white;padding:12px 25px;border:none;border-radius:50px;font-size:16px;font-weight:bold;cursor:pointer;">🌐 Chrome mein kholo</button></a></div>`;
+}
+</script>
+
 <div id="authScreen"><div class="auth-box"><h2>Login Required</h2><button onclick="login()">Login with Google</button></div></div>      
 <div class="navbar">              
 <div style="display:flex; align-items:center;">              
@@ -44,7 +59,30 @@ button:active{transform:scale(0.95);}
 <span>🅼🄾🆅🄸🄱🄴</span>              
 </div>              
 </div>              
-<div class="sidebar" id="sidebar"><h3>Menu</h3><button onclick="logout()">Logout</button><p id="userInfo"></p><hr><input type="text" id="shopLink" placeholder="Enter shop link"><button onclick="addShop()">Add Link</button><button onclick="closeMenu()">❌ Close</button></div>              
+<div class="sidebar" id="sidebar">
+  <h3>Menu</h3>
+  <button onclick="logout()">Logout</button>
+  <p id="userInfo"></p>
+  <hr>
+  <input type="text" id="shopLink" placeholder="Enter shop link">
+  <button onclick="addShop()">Add Link</button>
+  <button onclick="closeMenu()">❌ Close</button>
+  <div class="profile-pic-wrapper">
+    <div class="profile-circle" onclick="document.getElementById('profileUpload').click()">
+      <img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+    </div>
+    <input type="file" id="profileUpload" accept="image/*" style="display:none" onchange="changeProfilePhoto(event)">
+    <small class="profile-label">Tap to change photo</small>
+  </div>
+  <div class="profile-input-box">
+    <span>👤</span>
+    <input type="text" id="usernameInput" placeholder="Username">
+  </div>
+  <div class="profile-input-box">
+    <span>🔒</span>
+    <input type="password" id="passwordInput" placeholder="Password">
+  </div>
+</div>
 <div class="overlay" id="overlay" onclick="closeMenu()"></div>              
 <div class="upload-box">              
 <input type="text" id="videoName" placeholder="Video Name">              
@@ -64,7 +102,6 @@ button:active{transform:scale(0.95);}
 </div>              
 <div class="container" id="videoContainer"></div>              
 <script>              
-// 👉 पूरा original JS same (short नहीं किया अब)
 const sidebar=document.getElementById("sidebar");const overlay=document.getElementById("overlay");const videoContainer=document.getElementById("videoContainer");
 function openMenu(){sidebar.classList.add("active");overlay.style.display="block";}
 function closeMenu(){sidebar.classList.remove("active");overlay.style.display="none";}
@@ -85,6 +122,8 @@ function startRecording(){if(!cameraStream)return alert("Camera ON karo");record
 function stopRecording(){if(mediaRecorder){mediaRecorder.stop();alert("Uploading...");}}
 function uploadVideo(){let name=document.getElementById("videoName").value;cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);loadVideos();}});}
 async function loadVideos(){let{data}=await supabaseClient.from("videos").select("*");videoContainer.innerHTML="";data.forEach(v=>{let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;});}
+function changeProfilePhoto(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){document.getElementById('profileImg').src=e.target.result;localStorage.setItem('profilePhoto',e.target.result);};reader.readAsDataURL(file);}
+window.addEventListener('load',function(){const saved=localStorage.getItem('profilePhoto');if(saved)document.getElementById('profileImg').src=saved;});
 </script>              
 </body>              
 </html>
