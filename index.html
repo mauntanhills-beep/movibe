@@ -1,4 +1,4 @@
-<!DOCTYPE html>              
+    <!DOCTYPE html>              
 <html>              
 <head>              
 <meta name="viewport" content="width=device-width, initial-scale=1.0">              
@@ -34,10 +34,53 @@ button:active{transform:scale(0.95);}
 .profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
 .profile-circle img{width:100%;height:100%;object-fit:cover;}
 .profile-label{color:white;font-size:11px;margin-top:5px;}
-.profile-input-box{display:flex;align-items:center;background:#1a1a1a;border-radius:8px;margin:6px 0;padding:4px 10px;}
-.profile-input-box span{font-size:18px;margin-right:8px;}
-.profile-input-box input{background:transparent;border:none;outline:none;color:white;width:100%;font-size:14px;padding:6px 0;}
-.profile-input-box input::placeholder{color:#aaa;}
+
+/* ── EDIT PROFILE PAGE ── */
+#editProfilePage{
+  position:fixed;inset:0;z-index:2000;
+  background:#b0dcea;display:none;flex-direction:column;
+}
+#editProfilePage.active{display:flex;}
+.ep-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.1);background:#b0dcea;
+}
+.ep-cancel,.ep-done{
+  background:none !important;border:none !important;font-size:16px !important;
+  cursor:pointer;font-weight:700;color:#2fa58d !important;
+  box-shadow:none !important;padding:6px 10px !important;
+  width:auto !important;margin:0 !important;
+}
+.ep-cancel::before,.ep-done::before{display:none !important;}
+.ep-cancel:hover,.ep-done:hover{background:none !important;transform:none !important;}
+.ep-header h2{font-size:18px;font-weight:800;color:#1a3c34;margin:0;}
+.ep-body{flex:1;overflow-y:auto;padding:20px;}
+.ep-photo-section{text-align:center;margin-bottom:24px;}
+.ep-avatar-wrap{position:relative;display:inline-block;cursor:pointer;}
+.ep-avatar{width:100px;height:100px;border-radius:50%;background:#c8e6f0;border:3px solid #2fa58d;overflow:hidden;margin:0 auto;}
+.ep-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.ep-cam-badge{position:absolute;bottom:2px;right:2px;background:#2fa58d;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:2px solid white;font-size:14px;}
+.ep-photo-label{margin-top:8px;font-size:14px;font-weight:700;color:#1a5c52;}
+.ep-field{background:rgba(255,255,255,0.45);border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.ep-field-icon{width:38px;height:38px;min-width:38px;background:#c5e8dc;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;color:#1a5c52;font-weight:800;}
+.ep-field-inner{flex:1;min-width:0;}
+.ep-field-inner label{font-size:12px;color:#1a5c52;font-weight:700;display:block;margin-bottom:2px;}
+.ep-field-inner input,.ep-field-inner textarea{width:100%;background:none;border:none;border-bottom:1.5px solid #2fa58d;font-size:15px;color:#1a3c34;outline:none;padding:2px 0;font-family:Arial;box-sizing:border-box;}
+.ep-field-inner textarea{resize:none;min-height:40px;}
+.ep-big-btn{
+  display:flex !important;justify-content:space-between;align-items:center;
+  background:#c5e8dc !important;border-radius:14px !important;
+  padding:14px 16px !important;margin-bottom:10px;cursor:pointer;
+  border:none;width:100%;box-sizing:border-box;
+}
+.ep-big-btn::before{display:none !important;}
+.ep-big-btn:hover{background:#b5ddd0 !important;transform:none !important;}
+.ep-big-btn-left{display:flex;align-items:center;gap:12px;}
+.ep-big-btn-icon{width:36px;height:36px;min-width:36px;background:#2fa58d;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ep-big-btn-text{font-size:14px;font-weight:700;color:#1a3c34;}
+.ep-arrow{font-size:18px;color:#2fa58d;}
+.saved-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2fa58d;color:white;padding:12px 28px;border-radius:30px;font-weight:700;font-size:15px;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap;}
+.saved-toast.show{opacity:1;}
 </style>              
 </head>              
 <body>
@@ -59,6 +102,7 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
 <span>🅼🄾🆅🄸🄱🄴</span>              
 </div>              
 </div>              
+
 <div class="sidebar" id="sidebar">
   <h3>Menu</h3>
   <button onclick="logout()">Logout</button>
@@ -68,21 +112,14 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
   <button onclick="addShop()">Add Link</button>
   <button onclick="closeMenu()">❌ Close</button>
   <div class="profile-pic-wrapper">
-    <div class="profile-circle" onclick="document.getElementById('profileUpload').click()">
+    <div class="profile-circle" onclick="openEditProfile()">
       <img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
     </div>
-    <input type="file" id="profileUpload" accept="image/*" style="display:none" onchange="changeProfilePhoto(event)">
     <small class="profile-label">Tap to change photo</small>
   </div>
-  <div class="profile-input-box">
-    <span>👤</span>
-    <input type="text" id="usernameInput" placeholder="Username">
-  </div>
-  <div class="profile-input-box">
-    <span>🔒</span>
-    <input type="password" id="passwordInput" placeholder="Password">
-  </div>
+  <button onclick="openEditProfile()">👤 My Profile</button>
 </div>
+
 <div class="overlay" id="overlay" onclick="closeMenu()"></div>              
 <div class="upload-box">              
 <input type="text" id="videoName" placeholder="Video Name">              
@@ -100,18 +137,102 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
 <button onclick="stopRecording()">⏹ Stop</button>              
 </div>              
 </div>              
-<div class="container" id="videoContainer"></div>              
+<div class="container" id="videoContainer"></div>
+
+<!-- EDIT PROFILE PAGE -->
+<div id="editProfilePage">
+  <div class="ep-header">
+    <button class="ep-cancel" onclick="closeEditProfile()">Cancel</button>
+    <h2>Edit Profile</h2>
+    <button class="ep-done" onclick="saveProfile()">Done</button>
+  </div>
+  <div class="ep-body">
+
+    <div class="ep-photo-section">
+      <div class="ep-avatar-wrap" onclick="document.getElementById('epPhotoInput').click()">
+        <div class="ep-avatar">
+          <img id="epAvatarImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+        </div>
+        <div class="ep-cam-badge">📷</div>
+      </div>
+      <div class="ep-photo-label">Change Profile Photo</div>
+    </div>
+    <input type="file" id="epPhotoInput" accept="image/*" style="display:none" onchange="handleEpPhoto(event)">
+
+    <div class="ep-field">
+      <div class="ep-field-icon">👤</div>
+      <div class="ep-field-inner">
+        <label>Name</label>
+        <input type="text" id="epName" placeholder="Your full name">
+      </div>
+    </div>
+    <div class="ep-field">
+      <div class="ep-field-icon">@</div>
+      <div class="ep-field-inner">
+        <label>Username</label>
+        <input type="text" id="epUsername" placeholder="@username">
+      </div>
+    </div>
+    <div class="ep-field">
+      <div class="ep-field-icon" style="font-size:12px;">PR</div>
+      <div class="ep-field-inner">
+        <label>Pronouns</label>
+        <input type="text" id="epPronouns" placeholder="he/him, she/her...">
+      </div>
+    </div>
+    <div class="ep-field">
+      <div class="ep-field-icon">🔗</div>
+      <div class="ep-field-inner">
+        <label>Website</label>
+        <input type="url" id="epWebsite" placeholder="https://yourwebsite.com">
+      </div>
+    </div>
+    <div class="ep-field">
+      <div class="ep-field-icon">✏️</div>
+      <div class="ep-field-inner">
+        <label>Bio</label>
+        <textarea id="epBio" placeholder="Tell something about you..."></textarea>
+      </div>
+    </div>
+
+    <button class="ep-big-btn">
+      <div class="ep-big-btn-left">
+        <div class="ep-big-btn-icon">👑</div>
+        <span class="ep-big-btn-text">Switch to Professional Account</span>
+      </div>
+      <span class="ep-arrow">›</span>
+    </button>
+    <button class="ep-big-btn">
+      <div class="ep-big-btn-left">
+        <div class="ep-big-btn-icon">🛡️</div>
+        <span class="ep-big-btn-text">Personal Information Settings</span>
+      </div>
+      <span class="ep-arrow">›</span>
+    </button>
+
+  </div>
+</div>
+
+<div class="saved-toast" id="savedToast">✅ Profile Saved!</div>
+
 <script>              
-const sidebar=document.getElementById("sidebar");const overlay=document.getElementById("overlay");const videoContainer=document.getElementById("videoContainer");
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("overlay");
+const videoContainer=document.getElementById("videoContainer");
+
 function openMenu(){sidebar.classList.add("active");overlay.style.display="block";}
 function closeMenu(){sidebar.classList.remove("active");overlay.style.display="none";}
 function toggleCameraPanel(){let panel=document.getElementById("cameraPanel");panel.style.display=panel.style.display==="none"?"block":"none";}
+
 const supabaseClient=window.supabase.createClient("https://wivkaloxlsibjjgtudps.supabase.co","sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg");
+
 async function login(){await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:"https://mauntanhills-beep.github.io/movibe"}});}
 async function logout(){await supabaseClient.auth.signOut();location.reload();}
 async function checkUser(){const{data}=await supabaseClient.auth.getUser();if(data.user){document.getElementById("authScreen").style.display="none";document.getElementById("userInfo").innerText=data.user.email;loadVideos();}else{document.getElementById("authScreen").style.display="flex";}}
 checkUser();
+
 function addShop(){let link=document.getElementById("shopLink").value.trim();if(!link)return;if(!link.startsWith("http"))link="https://"+link;let preview=`https://api.microlink.io/?url=${link}`;videoContainer.innerHTML+=`<div class="video"><img src="${preview}"><p>${link}</p><a href="${link}" target="_blank"><button>Open</button></a></div>`;}
+
 let cameraStream=null;let mediaRecorder;let recordedChunks=[];let currentFacing="user";let flashOn=false;let micOn=false;
 async function toggleCamera(){let preview=document.getElementById("cameraPreview");if(!cameraStream){cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:currentFacing}});let v=document.createElement("video");v.id="liveCamera";v.srcObject=cameraStream;v.autoplay=true;preview.innerHTML="";preview.appendChild(v);}else{cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;preview.innerHTML="";}}
 async function switchCamera(){currentFacing=currentFacing==="user"?"environment":"user";if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;toggleCamera();}}
@@ -122,8 +243,55 @@ function startRecording(){if(!cameraStream)return alert("Camera ON karo");record
 function stopRecording(){if(mediaRecorder){mediaRecorder.stop();alert("Uploading...");}}
 function uploadVideo(){let name=document.getElementById("videoName").value;cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);loadVideos();}});}
 async function loadVideos(){let{data}=await supabaseClient.from("videos").select("*");videoContainer.innerHTML="";data.forEach(v=>{let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;});}
-function changeProfilePhoto(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(e){document.getElementById('profileImg').src=e.target.result;localStorage.setItem('profilePhoto',e.target.result);};reader.readAsDataURL(file);}
-window.addEventListener('load',function(){const saved=localStorage.getItem('profilePhoto');if(saved)document.getElementById('profileImg').src=saved;});
+
+function openEditProfile(){
+  closeMenu();
+  document.getElementById('epName').value=localStorage.getItem('epName')||'';
+  document.getElementById('epUsername').value=localStorage.getItem('epUsername')||'';
+  document.getElementById('epPronouns').value=localStorage.getItem('epPronouns')||'';
+  document.getElementById('epWebsite').value=localStorage.getItem('epWebsite')||'';
+  document.getElementById('epBio').value=localStorage.getItem('epBio')||'';
+  const saved=localStorage.getItem('profilePhoto');
+  if(saved)document.getElementById('epAvatarImg').src=saved;
+  document.getElementById('editProfilePage').classList.add('active');
+}
+
+function closeEditProfile(){
+  document.getElementById('editProfilePage').classList.remove('active');
+}
+
+function handleEpPhoto(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const src=e.target.result;
+    document.getElementById('epAvatarImg').src=src;
+    document.getElementById('profileImg').src=src;
+    localStorage.setItem('profilePhoto',src);
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProfile(){
+  localStorage.setItem('epName',document.getElementById('epName').value);
+  localStorage.setItem('epUsername',document.getElementById('epUsername').value);
+  localStorage.setItem('epPronouns',document.getElementById('epPronouns').value);
+  localStorage.setItem('epWebsite',document.getElementById('epWebsite').value);
+  localStorage.setItem('epBio',document.getElementById('epBio').value);
+  const toast=document.getElementById('savedToast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2500);
+  closeEditProfile();
+}
+
+window.addEventListener('load',function(){
+  const saved=localStorage.getItem('profilePhoto');
+  if(saved){
+    document.getElementById('profileImg').src=saved;
+    document.getElementById('epAvatarImg').src=saved;
+  }
+});
 </script>              
 </body>              
 </html>
