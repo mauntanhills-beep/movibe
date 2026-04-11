@@ -1,4 +1,4 @@
-    <!DOCTYPE html>              
+<!DOCTYPE html>              
 <html>              
 <head>              
 <meta name="viewport" content="width=device-width, initial-scale=1.0">              
@@ -34,23 +34,10 @@ button:active{transform:scale(0.95);}
 .profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
 .profile-circle img{width:100%;height:100%;object-fit:cover;}
 .profile-label{color:white;font-size:11px;margin-top:5px;}
-
-/* ── EDIT PROFILE PAGE ── */
-#editProfilePage{
-  position:fixed;inset:0;z-index:2000;
-  background:#b0dcea;display:none;flex-direction:column;
-}
+#editProfilePage{position:fixed;inset:0;z-index:2000;background:#b0dcea;display:none;flex-direction:column;}
 #editProfilePage.active{display:flex;}
-.ep-header{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.1);background:#b0dcea;
-}
-.ep-cancel,.ep-done{
-  background:none !important;border:none !important;font-size:16px !important;
-  cursor:pointer;font-weight:700;color:#2fa58d !important;
-  box-shadow:none !important;padding:6px 10px !important;
-  width:auto !important;margin:0 !important;
-}
+.ep-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.1);background:#b0dcea;}
+.ep-cancel,.ep-done{background:none !important;border:none !important;font-size:16px !important;cursor:pointer;font-weight:700;color:#2fa58d !important;box-shadow:none !important;padding:6px 10px !important;width:auto !important;margin:0 !important;}
 .ep-cancel::before,.ep-done::before{display:none !important;}
 .ep-cancel:hover,.ep-done:hover{background:none !important;transform:none !important;}
 .ep-header h2{font-size:18px;font-weight:800;color:#1a3c34;margin:0;}
@@ -67,12 +54,7 @@ button:active{transform:scale(0.95);}
 .ep-field-inner label{font-size:12px;color:#1a5c52;font-weight:700;display:block;margin-bottom:2px;}
 .ep-field-inner input,.ep-field-inner textarea{width:100%;background:none;border:none;border-bottom:1.5px solid #2fa58d;font-size:15px;color:#1a3c34;outline:none;padding:2px 0;font-family:Arial;box-sizing:border-box;}
 .ep-field-inner textarea{resize:none;min-height:40px;}
-.ep-big-btn{
-  display:flex !important;justify-content:space-between;align-items:center;
-  background:#c5e8dc !important;border-radius:14px !important;
-  padding:14px 16px !important;margin-bottom:10px;cursor:pointer;
-  border:none;width:100%;box-sizing:border-box;
-}
+.ep-big-btn{display:flex !important;justify-content:space-between;align-items:center;background:#c5e8dc !important;border-radius:14px !important;padding:14px 16px !important;margin-bottom:10px;cursor:pointer;border:none;width:100%;box-sizing:border-box;}
 .ep-big-btn::before{display:none !important;}
 .ep-big-btn:hover{background:#b5ddd0 !important;transform:none !important;}
 .ep-big-btn-left{display:flex;align-items:center;gap:12px;}
@@ -139,7 +121,6 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
 </div>              
 <div class="container" id="videoContainer"></div>
 
-<!-- EDIT PROFILE PAGE -->
 <div id="editProfilePage">
   <div class="ep-header">
     <button class="ep-cancel" onclick="closeEditProfile()">Cancel</button>
@@ -147,7 +128,6 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
     <button class="ep-done" onclick="saveProfile()">Done</button>
   </div>
   <div class="ep-body">
-
     <div class="ep-photo-section">
       <div class="ep-avatar-wrap" onclick="document.getElementById('epPhotoInput').click()">
         <div class="ep-avatar">
@@ -158,7 +138,6 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
       <div class="ep-photo-label">Change Profile Photo</div>
     </div>
     <input type="file" id="epPhotoInput" accept="image/*" style="display:none" onchange="handleEpPhoto(event)">
-
     <div class="ep-field">
       <div class="ep-field-icon">👤</div>
       <div class="ep-field-inner">
@@ -194,7 +173,6 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
         <textarea id="epBio" placeholder="Tell something about you..."></textarea>
       </div>
     </div>
-
     <button class="ep-big-btn">
       <div class="ep-big-btn-left">
         <div class="ep-big-btn-icon">👑</div>
@@ -209,7 +187,6 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
       </div>
       <span class="ep-arrow">›</span>
     </button>
-
   </div>
 </div>
 
@@ -228,7 +205,7 @@ const supabaseClient=window.supabase.createClient("https://wivkaloxlsibjjgtudps.
 
 async function login(){await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:"https://mauntanhills-beep.github.io/movibe"}});}
 async function logout(){await supabaseClient.auth.signOut();location.reload();}
-async function checkUser(){const{data}=await supabaseClient.auth.getUser();if(data.user){document.getElementById("authScreen").style.display="none";document.getElementById("userInfo").innerText=data.user.email;loadVideos();}else{document.getElementById("authScreen").style.display="flex";}}
+async function checkUser(){const{data}=await supabaseClient.auth.getUser();if(data.user){document.getElementById("authScreen").style.display="none";document.getElementById("userInfo").innerText=data.user.email;loadVideos();loadProfilePhoto();}else{document.getElementById("authScreen").style.display="flex";}}
 checkUser();
 
 function addShop(){let link=document.getElementById("shopLink").value.trim();if(!link)return;if(!link.startsWith("http"))link="https://"+link;let preview=`https://api.microlink.io/?url=${link}`;videoContainer.innerHTML+=`<div class="video"><img src="${preview}"><p>${link}</p><a href="${link}" target="_blank"><button>Open</button></a></div>`;}
@@ -244,16 +221,36 @@ function stopRecording(){if(mediaRecorder){mediaRecorder.stop();alert("Uploading
 function uploadVideo(){let name=document.getElementById("videoName").value;cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);loadVideos();}});}
 async function loadVideos(){let{data}=await supabaseClient.from("videos").select("*");videoContainer.innerHTML="";data.forEach(v=>{let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;});}
 
-function openEditProfile(){
+// ── PROFILE — SUPABASE ──
+let currentPhotoBase64=null;
+
+async function loadProfilePhoto(){
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  const{data}=await supabaseClient.from('profiles').select('photo_url').eq('id',userData.user.id).single();
+  if(data&&data.photo_url){
+    document.getElementById('profileImg').src=data.photo_url;
+    document.getElementById('epAvatarImg').src=data.photo_url;
+  }
+}
+
+async function openEditProfile(){
   closeMenu();
-  document.getElementById('epName').value=localStorage.getItem('epName')||'';
-  document.getElementById('epUsername').value=localStorage.getItem('epUsername')||'';
-  document.getElementById('epPronouns').value=localStorage.getItem('epPronouns')||'';
-  document.getElementById('epWebsite').value=localStorage.getItem('epWebsite')||'';
-  document.getElementById('epBio').value=localStorage.getItem('epBio')||'';
-  const saved=localStorage.getItem('profilePhoto');
-  if(saved)document.getElementById('epAvatarImg').src=saved;
   document.getElementById('editProfilePage').classList.add('active');
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  const{data}=await supabaseClient.from('profiles').select('*').eq('id',userData.user.id).single();
+  if(data){
+    document.getElementById('epName').value=data.name||'';
+    document.getElementById('epUsername').value=data.username||'';
+    document.getElementById('epPronouns').value=data.pronouns||'';
+    document.getElementById('epWebsite').value=data.website||'';
+    document.getElementById('epBio').value=data.bio||'';
+    if(data.photo_url){
+      document.getElementById('epAvatarImg').src=data.photo_url;
+      document.getElementById('profileImg').src=data.photo_url;
+    }
+  }
 }
 
 function closeEditProfile(){
@@ -265,33 +262,35 @@ function handleEpPhoto(event){
   if(!file)return;
   const reader=new FileReader();
   reader.onload=function(e){
-    const src=e.target.result;
-    document.getElementById('epAvatarImg').src=src;
-    document.getElementById('profileImg').src=src;
-    localStorage.setItem('profilePhoto',src);
+    currentPhotoBase64=e.target.result;
+    document.getElementById('epAvatarImg').src=e.target.result;
+    document.getElementById('profileImg').src=e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-function saveProfile(){
-  localStorage.setItem('epName',document.getElementById('epName').value);
-  localStorage.setItem('epUsername',document.getElementById('epUsername').value);
-  localStorage.setItem('epPronouns',document.getElementById('epPronouns').value);
-  localStorage.setItem('epWebsite',document.getElementById('epWebsite').value);
-  localStorage.setItem('epBio',document.getElementById('epBio').value);
+async function saveProfile(){
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  let photo_url=null;
+  if(currentPhotoBase64){
+    const fd=new FormData();
+    fd.append('file',currentPhotoBase64);
+    fd.append('upload_preset','latw_preset');
+    const res=await fetch('https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload',{method:'POST',body:fd});
+    const d=await res.json();
+    photo_url=d.secure_url;
+  }
+  const updates={id:userData.user.id,name:document.getElementById('epName').value,username:document.getElementById('epUsername').value,pronouns:document.getElementById('epPronouns').value,website:document.getElementById('epWebsite').value,bio:document.getElementById('epBio').value,updated_at:new Date().toISOString()};
+  if(photo_url){updates.photo_url=photo_url;document.getElementById('profileImg').src=photo_url;document.getElementById('epAvatarImg').src=photo_url;}
+  const{error}=await supabaseClient.from('profiles').upsert(updates);
+  if(error){alert('Error: '+error.message);return;}
+  currentPhotoBase64=null;
   const toast=document.getElementById('savedToast');
   toast.classList.add('show');
   setTimeout(()=>toast.classList.remove('show'),2500);
   closeEditProfile();
 }
-
-window.addEventListener('load',function(){
-  const saved=localStorage.getItem('profilePhoto');
-  if(saved){
-    document.getElementById('profileImg').src=saved;
-    document.getElementById('epAvatarImg').src=saved;
-  }
-});
 </script>              
 </body>              
 </html>
