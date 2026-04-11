@@ -34,10 +34,6 @@ button:active{transform:scale(0.95);}
 .profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
 .profile-circle img{width:100%;height:100%;object-fit:cover;}
 .profile-label{color:white;font-size:11px;margin-top:5px;}
-.profile-name-label{color:white;font-size:14px;font-weight:bold;margin-top:4px;}
-.video-user{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-.video-user img{width:32px;height:32px;border-radius:50%;object-fit:cover;border:2px solid #2fa58d;}
-.video-user span{font-size:13px;font-weight:bold;color:#1a3c34;}
 #editProfilePage{position:fixed;inset:0;z-index:2000;background:#b0dcea;display:none;flex-direction:column;}
 #editProfilePage.active{display:flex;}
 .ep-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.1);background:#b0dcea;}
@@ -102,7 +98,6 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
       <img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
     </div>
     <small class="profile-label">Tap to change photo</small>
-    <span class="profile-name-label" id="sidebarName"></span>
   </div>
   <button onclick="openEditProfile()">👤 My Profile</button>
 </div>
@@ -220,28 +215,11 @@ async function toggleCamera(){let preview=document.getElementById("cameraPreview
 async function switchCamera(){currentFacing=currentFacing==="user"?"environment":"user";if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;toggleCamera();}}
 async function toggleFlash(){if(!cameraStream)return alert("Camera ON karo");let track=cameraStream.getVideoTracks()[0];let cap=track.getCapabilities();if(!cap.torch){return alert("Flash support nahi hai");}flashOn=!flashOn;await track.applyConstraints({advanced:[{torch:flashOn}]});}
 function toggleMic(){micOn=!micOn;document.getElementById("micBtn").innerText=micOn?"🎤 Mic ON":"🎤 Mic OFF";}
-async function capturePhoto(){if(!cameraStream)return alert("Camera ON karo");let video=document.getElementById("liveCamera");let canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext("2d").drawImage(video,0,0);let blob=await(await fetch(canvas.toDataURL())).blob();let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});let data=await res.json();
-const{data:userData}=await supabaseClient.auth.getUser();
-const{data:profile}=await supabaseClient.from('profiles').select('name,photo_url').eq('id',userData.user.id).single();
-await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image",user_id:userData.user.id,username:profile?.name||'',photo_url:profile?.photo_url||''}]);loadVideos();}
-function startRecording(){if(!cameraStream)return alert("Camera ON karo");recordedChunks=[];mediaRecorder=new MediaRecorder(cameraStream);mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};mediaRecorder.onstop=async()=>{let blob=new Blob(recordedChunks,{type:"video/webm"});let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});let data=await res.json();
-const{data:userData}=await supabaseClient.auth.getUser();
-const{data:profile}=await supabaseClient.from('profiles').select('name,photo_url').eq('id',userData.user.id).single();
-await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video",user_id:userData.user.id,username:profile?.name||'',photo_url:profile?.photo_url||''}]);loadVideos();};mediaRecorder.start();alert("Recording start");}
+async function capturePhoto(){if(!cameraStream)return alert("Camera ON karo");let video=document.getElementById("liveCamera");let canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext("2d").drawImage(video,0,0);let blob=await(await fetch(canvas.toDataURL())).blob();let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});let data=await res.json();await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image"}]);loadVideos();}
+function startRecording(){if(!cameraStream)return alert("Camera ON karo");recordedChunks=[];mediaRecorder=new MediaRecorder(cameraStream);mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};mediaRecorder.onstop=async()=>{let blob=new Blob(recordedChunks,{type:"video/webm"});let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});let data=await res.json();await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video"}]);loadVideos();};mediaRecorder.start();alert("Recording start");}
 function stopRecording(){if(mediaRecorder){mediaRecorder.stop();alert("Uploading...");}}
-async function uploadVideo(){let name=document.getElementById("videoName").value;
-const{data:userData}=await supabaseClient.auth.getUser();
-const{data:profile}=await supabaseClient.from('profiles').select('name,photo_url').eq('id',userData.user.id).single();
-cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type,user_id:userData.user.id,username:profile?.name||'',photo_url:profile?.photo_url||''}]);loadVideos();}});}
-async function loadVideos(){
-  let{data}=await supabaseClient.from("videos").select("*");
-  videoContainer.innerHTML="";
-  data.forEach(v=>{
-    let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;
-    let userRow=`<div class="video-user"><img src="${v.photo_url||'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"><span>${v.username||'Unknown'}</span></div>`;
-    videoContainer.innerHTML+=`<div class="video">${userRow}${media}<p>${v.title}</p></div>`;
-  });
-}
+function uploadVideo(){let name=document.getElementById("videoName").value;cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);loadVideos();}});}
+async function loadVideos(){let{data}=await supabaseClient.from("videos").select("*");videoContainer.innerHTML="";data.forEach(v=>{let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;});}
 
 // ── PROFILE — SUPABASE ──
 let currentPhotoBase64=null;
@@ -249,10 +227,10 @@ let currentPhotoBase64=null;
 async function loadProfilePhoto(){
   const{data:userData}=await supabaseClient.auth.getUser();
   if(!userData.user)return;
-  const{data}=await supabaseClient.from('profiles').select('photo_url,name').eq('id',userData.user.id).single();
-  if(data){
-    if(data.photo_url){document.getElementById('profileImg').src=data.photo_url;document.getElementById('epAvatarImg').src=data.photo_url;}
-    if(data.name)document.getElementById('sidebarName').innerText=data.name;
+  const{data}=await supabaseClient.from('profiles').select('photo_url').eq('id',userData.user.id).single();
+  if(data&&data.photo_url){
+    document.getElementById('profileImg').src=data.photo_url;
+    document.getElementById('epAvatarImg').src=data.photo_url;
   }
 }
 
@@ -268,12 +246,16 @@ async function openEditProfile(){
     document.getElementById('epPronouns').value=data.pronouns||'';
     document.getElementById('epWebsite').value=data.website||'';
     document.getElementById('epBio').value=data.bio||'';
-    if(data.photo_url){document.getElementById('epAvatarImg').src=data.photo_url;document.getElementById('profileImg').src=data.photo_url;}
-    if(data.name)document.getElementById('sidebarName').innerText=data.name;
+    if(data.photo_url){
+      document.getElementById('epAvatarImg').src=data.photo_url;
+      document.getElementById('profileImg').src=data.photo_url;
+    }
   }
 }
 
-function closeEditProfile(){document.getElementById('editProfilePage').classList.remove('active');}
+function closeEditProfile(){
+  document.getElementById('editProfilePage').classList.remove('active');
+}
 
 function handleEpPhoto(event){
   const file=event.target.files[0];
@@ -284,4 +266,31 @@ function handleEpPhoto(event){
     document.getElementById('epAvatarImg').src=e.target.result;
     document.getElementById('profileImg').src=e.target.result;
   };
-  reader.readAsD
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile(){
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  let photo_url=null;
+  if(currentPhotoBase64){
+    const fd=new FormData();
+    fd.append('file',currentPhotoBase64);
+    fd.append('upload_preset','latw_preset');
+    const res=await fetch('https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload',{method:'POST',body:fd});
+    const d=await res.json();
+    photo_url=d.secure_url;
+  }
+  const updates={id:userData.user.id,name:document.getElementById('epName').value,username:document.getElementById('epUsername').value,pronouns:document.getElementById('epPronouns').value,website:document.getElementById('epWebsite').value,bio:document.getElementById('epBio').value,updated_at:new Date().toISOString()};
+  if(photo_url){updates.photo_url=photo_url;document.getElementById('profileImg').src=photo_url;document.getElementById('epAvatarImg').src=photo_url;}
+  const{error}=await supabaseClient.from('profiles').upsert(updates);
+  if(error){alert('Error: '+error.message);return;}
+  currentPhotoBase64=null;
+  const toast=document.getElementById('savedToast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2500);
+  closeEditProfile();
+}
+</script>              
+</body>              
+</html>
