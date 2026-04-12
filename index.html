@@ -301,4 +301,3 @@ async function openEditProfile(){
   const{data}=await supabaseClient.from('profiles').select('*').eq('id',userData.user.id).single();
   if(data){
     document.getElementById('epName').value=data.name||'';
-    document.getElementById
