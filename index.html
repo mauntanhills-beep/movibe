@@ -8,168 +8,120 @@
 <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 
 <style>
-body { margin:0; font-family:Arial; background:#e6f2ff; }
+body { margin:0; font-family:Arial, sans-serif; background:#e6f2ff; overflow-x:hidden; }
 #authScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;}
 .auth-box{background:#f5fbff;padding:30px;border-radius:10px;text-align:center;}
-.navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-.menu-btn { font-size:25px; cursor:pointer; color:skyblue; }
-.cam-icon{ background:none; font-size:20px; margin-left:10px; cursor:pointer; }
-.logo { display:flex; align-items:center; gap:10px; font-weight:bold; }
-.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:skyblue; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; overflow-y:auto; box-sizing:border-box;}
+
+/* NAVBAR */
+.navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100; }
+.menu-btn { font-size:25px; cursor:pointer; color:#2fa58d; }
+.logo { font-weight:bold; font-size:20px; color:#2fa58d; }
+
+/* STORY TRAY */
+.story-tray { display:flex; gap:15px; padding:15px; background:white; overflow-x:auto; border-bottom:1px solid #ddd; scrollbar-width:none; }
+.story-tray::-webkit-scrollbar { display:none; }
+.story-item { display:flex; flex-direction:column; align-items:center; min-width:75px; cursor:pointer; }
+.story-ring { width:66px; height:66px; border-radius:50%; padding:3px; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); display:flex; justify-content:center; align-items:center; }
+.story-ring.watched { background: #ddd; }
+.story-ring img { width:100%; height:100%; border-radius:50%; border:3px solid white; object-fit:cover; }
+.story-name { font-size:11px; margin-top:5px; color:#333; width:70px; text-align:center; overflow:hidden; text-overflow:ellipsis; }
+.add-btn-icon { position:absolute; bottom:5px; right:5px; background:#2fa58d; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:15px; border:2px solid white; }
+
+/* STORY VIEWER & INTERACTIONS */
+#storyViewer { position:fixed; inset:0; background:black; z-index:5000; display:none; flex-direction:column; }
+#storyViewer.active { display:flex; }
+.story-progress { position:absolute; top:10px; left:10px; right:10px; height:3px; background:rgba(255,255,255,0.3); border-radius:10px; overflow:hidden; }
+.story-progress-fill { height:100%; width:0%; background:white; transition: width linear; }
+.story-header { padding:25px 20px; display:flex; align-items:center; justify-content:space-between; color:white; z-index:5001; }
+.story-user { display:flex; align-items:center; gap:10px; }
+.story-user img { width:35px; height:35px; border-radius:50%; border:1px solid white; }
+
+/* VIEWERS & REPLIES */
+.story-footer { position:absolute; bottom:0; width:100%; padding:20px; box-sizing:border-box; background:linear-gradient(transparent, rgba(0,0,0,0.8)); display:flex; flex-direction:column; gap:10px; }
+.reply-box { display:flex; gap:10px; align-items:center; }
+.reply-input { flex:1; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); border-radius:25px; padding:10px 15px; color:white; outline:none; }
+.viewer-count { color:white; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:5px; }
+
+/* GRID & POSTS */
+.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; padding:15px; }
+.video-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+.video-card video, .video-card img { width:100%; aspect-ratio:1; object-fit:cover; }
+
+button { display:flex; align-items:center; gap:8px; padding:10px 18px; border:none; border-radius:50px; background:#2fa58d; color:white; font-weight:bold; cursor:pointer; }
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:#2fa58d; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; color:white; }
 .sidebar.active { transform:translateX(0); }
-.overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); display:none; z-index:1000; }
-.sidebar button,.sidebar input { width:100%; margin:10px 0; padding:8px; border:none; border-radius:5px; box-sizing:border-box;}
-.upload-box { background:white; padding:15px; margin:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; }
-.camera-panel { background:#f5fbff; padding:10px; border-radius:10px; display:none; }
-.camera-controls { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin-top:10px; }
-.camera-controls button { flex:0 0 auto; min-width:70px; }
-.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; padding:20px; }
-.video { background:white; padding:10px; border-radius:10px; }
-video,img { width:100%; border-radius:10px; }
-button {display:flex;align-items:center;gap:10px;padding:10px 15px;border:none;border-radius:50px;background:#2fa58d;color:white;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.15);transition:0.3s;}
-button::before{content:"➤";background:white;color:#2fa58d;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
-button:hover{background:#248f79;transform:scale(1.05);}
-button:active{transform:scale(0.95);}
-
-/* PROFILE UI */
-.profile-pic-wrapper{display:flex;flex-direction:column;align-items:center;margin:15px 0 5px;}
-.profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
-.profile-circle img{width:100%;height:100%;object-fit:cover;}
-.sidebar-profile-name{color:white;font-size:14px;font-weight:700;margin-top:4px;text-align:center;}
-
-#publicProfileCard{background:white;margin:15px;border-radius:14px;padding:16px 18px;display:none;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,0.08);}
-#publicProfileCard.show{display:flex;}
-.pub-avatar{width:56px;height:56px;min-width:56px;border-radius:50%;overflow:hidden;border:2px solid #2fa58d;}
-.pub-avatar img{width:100%;height:100%;object-fit:cover;}
-
-/* STATUS BAR */
-#myStatusBar{background:white;margin:0 15px 10px;border-radius:12px;padding:10px 14px;display:none;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);}
-#myStatusBar.show{display:flex;}
-.status-avatar{width:44px;height:44px;border-radius:50%;overflow:hidden;border:3px solid #2fa58d;}
-.status-input-wrap{flex:1;}
-.status-input-wrap input{width:100%;border:none;border-bottom:1.5px solid #2fa58d;outline:none;padding:4px 0;}
-
-/* FRIENDS & PUBLIC LIST */
-#friendsPage{position:fixed;inset:0;z-index:3000;background:#e6f2ff;display:none;flex-direction:column;}
-#friendsPage.active{display:flex;}
-.fp-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:white;box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-.fp-body{flex:1;overflow-y:auto;padding:15px;}
-.fp-user-card{background:white;border-radius:16px;margin-bottom:14px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.08);}
-.fp-user-avatar{width:54px;height:54px;border-radius:50%;overflow:hidden;border:2px solid #2fa58d;}
-.fp-videos-row{display:flex;gap:8px;overflow-x:auto;margin-top:10px;}
-.fp-video-thumb{min-width:70px;height:70px;border-radius:10px;background:#eee;overflow:hidden;}
-.fp-video-thumb img, .fp-video-thumb video{width:100%;height:100%;object-fit:cover;}
-
-/* EDIT PROFILE */
-#editProfilePage{position:fixed;inset:0;z-index:2000;background:#b0dcea;display:none;flex-direction:column;}
-#editProfilePage.active{display:flex;}
-.ep-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#b0dcea;}
-.ep-body{flex:1;overflow-y:auto;padding:20px;}
-.ep-field{background:white;border-radius:14px;padding:10px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
-.ep-field-inner input{width:100%;border:none;outline:none;font-size:15px;}
-
-/* USER PROFILE VIEW */
-#userProfilePage{position:fixed;inset:0;z-index:4000;background:#e6f2ff;display:none;flex-direction:column;}
-#userProfilePage.active{display:flex;}
-.up-media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:10px;}
-.up-media-item{aspect-ratio:1;background:#ddd;overflow:hidden;border-radius:8px;}
-.up-media-item img, .up-media-item video{width:100%;height:100%;object-fit:cover;}
-
-.saved-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#2fa58d;color:white;padding:12px 28px;border-radius:30px;opacity:0;transition:0.3s;z-index:9999;}
-.saved-toast.show{opacity:1;}
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; z-index:1000; }
 </style>
 </head>
 <body>
 
-<div id="authScreen"><div class="auth-box"><h2>Login Required</h2><button onclick="login()">Login with Google</button></div></div>
+<div id="authScreen"><div class="auth-box"><h2>🅼🄾🆅🄸🄱🄴</h2><button onclick="login()">Login with Google</button></div></div>
 
 <div class="navbar">
-  <div style="display:flex;align-items:center;">
-    <div class="menu-btn" onclick="openMenu()">☰</div>
-    <button onclick="toggleCameraPanel()" class="cam-icon">📷</button>
-  </div>
-  <div class="logo"><span>🅼🄾🆅🄸🄱🄴</span></div>
+  <div class="menu-btn" onclick="openMenu()">☰</div>
+  <div class="logo">MOVIBE</div>
+  <div style="font-size:20px; cursor:pointer;" onclick="toggleCameraPanel()">📷</div>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <button onclick="logout()">Logout</button>
-  <button onclick="openFriendsPage()" style="background:#1a8f7a;">👥 Friends (Public Users)</button>
-  <div class="profile-pic-wrapper">
-    <div class="profile-circle" onclick="openEditProfile()"><img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></div>
-    <div class="sidebar-profile-name" id="sidebarName"></div>
-  </div>
-  <button onclick="openEditProfile()">👤 My Profile</button>
-  <button onclick="closeMenu()">❌ Close</button>
-</div>
-<div class="overlay" id="overlay" onclick="closeMenu()"></div>
-
-<div id="publicProfileCard">
-  <div class="pub-avatar"><img id="pubCardPhoto" src=""></div>
-  <div class="pub-info">
-    <p id="pubCardName" style="font-weight:800;margin:0;"></p>
-    <p id="pubCardUsername" style="color:#2fa58d;font-size:12px;margin:0;"></p>
-    <p id="pubCardBio" style="font-size:12px;margin:0;"></p>
+<div class="story-tray" id="storyTray">
+  <div class="story-item" onclick="uploadStory()">
+    <div style="position:relative;">
+      <div class="story-ring watched"><img id="myStoryAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></div>
+      <div class="add-btn-icon">+</div>
+    </div>
+    <div class="story-name">Your Story</div>
   </div>
 </div>
 
-<div id="myStatusBar">
-  <div class="status-avatar"><img id="statusBarPhoto" src=""></div>
-  <div class="status-input-wrap"><input type="text" id="myStatusInput" placeholder="Apna status likhein..."></div>
-  <button onclick="saveMyStatus()" style="padding:5px 15px; font-size:12px;">Post</button>
+<div style="padding:15px;">
+  <div style="background:white; padding:15px; border-radius:15px;">
+    <input type="text" id="videoName" placeholder="Post Title..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:10px; margin-bottom:10px; outline:none;">
+    <button onclick="uploadVideo()" style="width:100%; justify-content:center;">📤 Upload Post</button>
+  </div>
 </div>
 
-<div class="upload-box">
-  <input type="text" id="videoName" placeholder="Video Title">
-  <button onclick="uploadVideo()">Upload</button>
-  <div id="cameraPanel" class="camera-panel">
-    <div id="cameraPreview"></div>
+<div id="cameraPanel" style="display:none; padding:15px; background:white; margin:15px; border-radius:15px; text-align:center;">
+    <div id="cameraPreview" style="background:#000; height:250px; border-radius:15px; margin-bottom:10px;"></div>
     <button onclick="toggleCamera()">ON/OFF</button>
     <button onclick="capturePhoto()">📸 Photo</button>
     <button onclick="startRecording()">🎥 Record</button>
-    <button onclick="stopRecording()">⏹ Stop</button>
-  </div>
 </div>
 
 <div class="container" id="videoContainer"></div>
 
-<div id="friendsPage">
-  <div class="fp-header"><button onclick="closeFriendsPage()">← Back</button><h2>Public Users</h2></div>
-  <div class="fp-body" id="friendsList"></div>
-</div>
-
-<div id="userProfilePage">
-  <div class="up-header"><button onclick="closeUserProfile()">← Back</button><h2 id="upHeaderName"></h2></div>
-  <div class="up-body">
-    <div style="text-align:center;padding:20px;background:white;">
-      <img id="upAvatar" style="width:80px;height:80px;border-radius:50%;border:3px solid #2fa58d;">
-      <h3 id="upName"></h3>
-      <p id="upBio" style="color:#666;"></p>
-      <div id="upStatusDisplay" style="background:#f0faff;padding:10px;border-radius:10px;margin:10px;"></div>
+<div id="storyViewer">
+    <div class="story-progress"><div class="story-progress-fill" id="storyProgress"></div></div>
+    <div class="story-header">
+        <div class="story-user">
+            <img id="storyUserImg" src="">
+            <span id="storyUserName"></span>
+        </div>
+        <div style="font-size:30px; cursor:pointer;" onclick="closeStory()">×</div>
     </div>
-    <div class="up-media-grid" id="upMediaGrid"></div>
-  </div>
-</div>
-
-<div id="editProfilePage">
-  <div class="ep-header"><button onclick="closeEditProfile()">Cancel</button><h2>Edit Profile</h2><button onclick="saveProfile()">Done</button></div>
-  <div class="ep-body">
-    <div class="ep-photo-section" onclick="document.getElementById('epPhotoInput').click()">
-      <img id="epAvatarImg" style="width:100px;height:100px;border-radius:50%;">
-      <p>Change Photo</p>
+    <div id="storyMediaHolder" style="flex:1; display:flex; align-items:center; justify-content:center;"></div>
+    
+    <div class="story-footer">
+        <div class="viewer-count" id="viewerSection">👁️ <span id="viewCount">0</span> views</div>
+        <div class="reply-box">
+            <input type="text" id="replyInput" class="reply-input" placeholder="Send reply...">
+            <button onclick="sendReply()" style="background:white; color:#2fa58d; padding:8px 15px;">Send</button>
+        </div>
     </div>
-    <input type="file" id="epPhotoInput" style="display:none" onchange="handlePhoto(event)">
-    <div class="ep-field"><input type="text" id="epName" placeholder="Name"></div>
-    <div class="ep-field"><input type="text" id="epUsername" placeholder="Username"></div>
-    <div class="ep-field"><input type="text" id="epBio" placeholder="Bio"></div>
-    <div class="ep-field"><input type="text" id="epStatus" placeholder="Status"></div>
-  </div>
 </div>
 
-<div class="saved-toast" id="savedToast">✅ Saved!</div>
+<div class="sidebar" id="sidebar">
+  <h2 id="sidebarName">User</h2>
+  <button onclick="openFriendsPage()">👥 Friends List</button>
+  <button onclick="logout()" style="background:#ff4d4d; color:white;">Logout</button>
+  <button onclick="closeMenu()">Close</button>
+</div>
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
 <script>
 const supabaseClient = window.supabase.createClient("https://wivkaloxlsibjjgtudps.supabase.co","sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg");
 let currentUser = null;
+let storyTimer;
+let currentActiveStoryId = null;
 
 async function login(){ await supabaseClient.auth.signInWithOAuth({provider:"google"}); }
 async function logout(){ await supabaseClient.auth.signOut(); location.reload(); }
@@ -181,102 +133,106 @@ async function checkUser(){
     document.getElementById("authScreen").style.display="none";
     loadMyProfile();
     loadVideos();
+    loadStories();
   }
 }
 checkUser();
 
+function uploadStory() {
+  cloudinary.openUploadWidget({cloudName:"dvks0ojbu", uploadPreset:"latw_preset"}, async(e,r)=>{
+    if(r.event==="success"){
+      await supabaseClient.from("videos").insert([{
+          title: "STORY_ITEM",
+          url: r.info.secure_url, 
+          type: r.info.resource_type, 
+          user_id: currentUser.id
+      }]);
+      loadStories();
+    }
+  });
+}
+
+async function loadStories() {
+    const tray = document.getElementById('storyTray');
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: stories } = await supabaseClient.from('videos').select('*, profiles(name, photo_url)').eq('title', 'STORY_ITEM').gt('created_at', yesterday).order('created_at', {ascending: false});
+    
+    const addBtn = tray.firstElementChild;
+    tray.innerHTML = '';
+    tray.appendChild(addBtn);
+
+    const usersSeen = new Set();
+    stories?.forEach(s => {
+        if(!usersSeen.has(s.user_id)) {
+            usersSeen.add(s.user_id);
+            const item = document.createElement('div');
+            item.className = 'story-item';
+            item.onclick = () => openStory(s);
+            item.innerHTML = `<div class="story-ring"><img src="${s.profiles?.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"></div><div class="story-name">${s.profiles?.name || 'User'}</div>`;
+            tray.appendChild(item);
+        }
+    });
+}
+
+async function openStory(story) {
+    currentActiveStoryId = story.id;
+    const viewer = document.getElementById('storyViewer');
+    const holder = document.getElementById('storyMediaHolder');
+    const progress = document.getElementById('storyProgress');
+    
+    document.getElementById('storyUserImg').src = story.profiles?.photo_url || '';
+    document.getElementById('storyUserName').innerText = story.profiles?.name || '';
+    viewer.classList.add('active');
+    
+    holder.innerHTML = story.type === 'video' 
+        ? `<video src="${story.url}" autoplay playsinline style="max-width:100%; max-height:100%;"></video>`
+        : `<img src="${story.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+
+    // Track View
+    if(story.user_id !== currentUser.id) {
+        await supabaseClient.from('story_interactions').upsert([{ story_id: story.id, user_id: currentUser.id, type: 'view' }]);
+    }
+    
+    // Get View Count
+    const { count } = await supabaseClient.from('story_interactions').select('*', { count: 'exact', head: true }).eq('story_id', story.id).eq('type', 'view');
+    document.getElementById('viewCount').innerText = count || 0;
+
+    progress.style.transition = 'none'; progress.style.width = '0%';
+    setTimeout(() => { progress.style.transition = 'width 5s linear'; progress.style.width = '100%'; }, 50);
+    storyTimer = setTimeout(closeStory, 5000);
+}
+
+async function sendReply() {
+    const text = document.getElementById('replyInput').value;
+    if(!text) return;
+    await supabaseClient.from('story_interactions').insert([{ story_id: currentActiveStoryId, user_id: currentUser.id, type: 'reply', content: text }]);
+    document.getElementById('replyInput').value = '';
+    alert("Reply sent!");
+}
+
+function closeStory() { document.getElementById('storyViewer').classList.remove('active'); clearTimeout(storyTimer); }
+function openMenu(){ document.getElementById("sidebar").classList.add("active"); document.getElementById("overlay").style.display="block"; }
+function closeMenu(){ document.getElementById("sidebar").classList.remove("active"); document.getElementById("overlay").style.display="none"; }
 async function loadMyProfile(){
   const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
   if(data){
-    const photo = data.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-    document.getElementById('pubCardName').innerText = data.name || 'User';
-    document.getElementById('sidebarName').innerText = data.name || 'User';
-    document.getElementById('pubCardUsername').innerText = '@'+(data.username||'user');
-    document.getElementById('pubCardBio').innerText = data.bio || '';
-    document.getElementById('pubCardPhoto').src = photo;
-    document.getElementById('profileImg').src = photo;
-    document.getElementById('statusBarPhoto').src = photo;
-    document.getElementById('epAvatarImg').src = photo;
-    document.getElementById('publicProfileCard').style.display = 'flex';
-    document.getElementById('myStatusBar').style.display = 'flex';
+      document.getElementById('myStoryAvatar').src = data.photo_url || '';
+      document.getElementById('sidebarName').innerText = data.name || 'User';
   }
 }
-
-async function openFriendsPage(){
-  document.getElementById('friendsPage').classList.add('active');
-  const { data: users } = await supabaseClient.from('profiles').select('*');
-  const list = document.getElementById('friendsList');
-  list.innerHTML = '';
-  users.forEach(async (u) => {
-    if(u.id === currentUser.id) return;
-    const { data: vids } = await supabaseClient.from('videos').select('*').eq('user_id', u.id).limit(3);
-    let vHtml = '';
-    vids?.forEach(v => {
-      vHtml += `<div class="fp-video-thumb">${v.type==='video'?`<video src="${v.url}"></video>`:`<img src="${v.url}">`}</div>`;
-    });
-    list.innerHTML += `
-      <div class="fp-user-card" onclick="viewUser('${u.id}')">
-        <div style="display:flex;gap:15px;align-items:center;">
-          <img src="${u.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" style="width:50px;height:50px;border-radius:50%;">
-          <div>
-            <div style="font-weight:bold;">${u.name || 'User'}</div>
-            <div style="font-size:12px;color:#666;">${u.status || 'No status'}</div>
-          </div>
-        </div>
-        <div class="fp-videos-row">${vHtml}</div>
-      </div>`;
-  });
-}
-
-async function viewUser(uid){
-  const { data: u } = await supabaseClient.from('profiles').select('*').eq('id', uid).single();
-  const { data: vids } = await supabaseClient.from('videos').select('*').eq('user_id', uid);
-  document.getElementById('upName').innerText = u.name;
-  document.getElementById('upHeaderName').innerText = u.name;
-  document.getElementById('upBio').innerText = u.bio || '';
-  document.getElementById('upAvatar').src = u.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-  document.getElementById('upStatusDisplay').innerText = u.status ? "📢 " + u.status : "";
-  
-  const grid = document.getElementById('upMediaGrid');
-  grid.innerHTML = '';
-  vids.forEach(v => {
-    grid.innerHTML += `<div class="up-media-item">${v.type==='video'?`<video src="${v.url}" controls></video>`:`<img src="${v.url}">`}</div>`;
-  });
-  document.getElementById('userProfilePage').classList.add('active');
-}
-
-function closeFriendsPage(){ document.getElementById('friendsPage').classList.remove('active'); }
-function closeUserProfile(){ document.getElementById('userProfilePage').classList.remove('active'); }
-function openMenu(){ document.getElementById("sidebar").classList.add("active"); document.getElementById("overlay").style.display="block"; }
-function closeMenu(){ document.getElementById("sidebar").classList.remove("active"); document.getElementById("overlay").style.display="none"; }
-function openEditProfile(){ closeMenu(); document.getElementById('editProfilePage').classList.add('active'); }
-function closeEditProfile(){ document.getElementById('editProfilePage').classList.remove('active'); }
-
-async function saveProfile(){
-  const update = {
-    id: currentUser.id,
-    name: document.getElementById('epName').value,
-    username: document.getElementById('epUsername').value,
-    bio: document.getElementById('epBio').value,
-    status: document.getElementById('epStatus').value
-  };
-  await supabaseClient.from('profiles').upsert(update);
-  location.reload();
-}
-
 async function loadVideos(){
-  let { data } = await supabaseClient.from("videos").select("*").eq("user_id", currentUser.id).order('id',{ascending:false});
+  let { data } = await supabaseClient.from("videos").select("*").neq("title", "STORY_ITEM").order('id',{ascending:false});
   const container = document.getElementById("videoContainer");
   container.innerHTML = "";
   data?.forEach(v => {
-    container.innerHTML += `<div class="video">${v.type==='video'?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`}<p>${v.title}</p></div>`;
+    container.innerHTML += `<div class="video-card">${v.type==='video'?`<video src="${v.url}" onclick="this.play()"></video>`:`<img src="${v.url}">`}<div style="padding:8px; font-size:13px;">${v.title}</div></div>`;
   });
 }
-
 function uploadVideo(){
+  let t = document.getElementById('videoName').value || "Post";
   cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"}, async(e,r)=>{
     if(r.event==="success"){
-      await supabaseClient.from("videos").insert([{title:document.getElementById('videoName').value, url:r.info.secure_url, type:r.info.resource_type, user_id:currentUser.id}]);
+      await supabaseClient.from("videos").insert([{title:t, url:r.info.secure_url, type:r.info.resource_type, user_id:currentUser.id}]);
       loadVideos();
     }
   });
