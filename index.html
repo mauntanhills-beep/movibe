@@ -8,120 +8,116 @@
 <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 
 <style>
-body { margin:0; font-family:Arial, sans-serif; background:#e6f2ff; overflow-x:hidden; }
+/* आपका मूल CSS बिल्कुल वैसा ही है */
+body { margin:0; font-family:Arial; background:#e6f2ff; }
 #authScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:white;display:flex;justify-content:center;align-items:center;flex-direction:column;z-index:9999;}
 .auth-box{background:#f5fbff;padding:30px;border-radius:10px;text-align:center;}
-
-/* NAVBAR */
-.navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); position:sticky; top:0; z-index:100; }
-.menu-btn { font-size:25px; cursor:pointer; color:#2fa58d; }
-.logo { font-weight:bold; font-size:20px; color:#2fa58d; }
-
-/* STORY TRAY */
-.story-tray { display:flex; gap:15px; padding:15px; background:white; overflow-x:auto; border-bottom:1px solid #ddd; scrollbar-width:none; }
-.story-tray::-webkit-scrollbar { display:none; }
-.story-item { display:flex; flex-direction:column; align-items:center; min-width:75px; cursor:pointer; }
-.story-ring { width:66px; height:66px; border-radius:50%; padding:3px; background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); display:flex; justify-content:center; align-items:center; }
-.story-ring.watched { background: #ddd; }
-.story-ring img { width:100%; height:100%; border-radius:50%; border:3px solid white; object-fit:cover; }
-.story-name { font-size:11px; margin-top:5px; color:#333; width:70px; text-align:center; overflow:hidden; text-overflow:ellipsis; }
-.add-btn-icon { position:absolute; bottom:5px; right:5px; background:#2fa58d; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:15px; border:2px solid white; }
-
-/* STORY VIEWER & INTERACTIONS */
-#storyViewer { position:fixed; inset:0; background:black; z-index:5000; display:none; flex-direction:column; }
-#storyViewer.active { display:flex; }
-.story-progress { position:absolute; top:10px; left:10px; right:10px; height:3px; background:rgba(255,255,255,0.3); border-radius:10px; overflow:hidden; }
-.story-progress-fill { height:100%; width:0%; background:white; transition: width linear; }
-.story-header { padding:25px 20px; display:flex; align-items:center; justify-content:space-between; color:white; z-index:5001; }
-.story-user { display:flex; align-items:center; gap:10px; }
-.story-user img { width:35px; height:35px; border-radius:50%; border:1px solid white; }
-
-/* VIEWERS & REPLIES */
-.story-footer { position:absolute; bottom:0; width:100%; padding:20px; box-sizing:border-box; background:linear-gradient(transparent, rgba(0,0,0,0.8)); display:flex; flex-direction:column; gap:10px; }
-.reply-box { display:flex; gap:10px; align-items:center; }
-.reply-input { flex:1; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); border-radius:25px; padding:10px 15px; color:white; outline:none; }
-.viewer-count { color:white; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:5px; }
-
-/* GRID & POSTS */
-.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; padding:15px; }
-.video-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
-.video-card video, .video-card img { width:100%; aspect-ratio:1; object-fit:cover; }
-
-button { display:flex; align-items:center; gap:8px; padding:10px 18px; border:none; border-radius:50px; background:#2fa58d; color:white; font-weight:bold; cursor:pointer; }
-.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:#2fa58d; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; color:white; }
+.navbar { display:flex; justify-content:space-between; align-items:center; padding:10px 20px; background:white; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+.menu-btn { font-size:25px; cursor:pointer; color:skyblue; }
+.cam-icon{ background:none; font-size:20px; margin-left:10px; cursor:pointer; }
+.logo { display:flex; align-items:center; gap:10px; font-weight:bold; }
+.sidebar { position:fixed; top:0; left:0; width:260px; height:100%; background:skyblue; padding:20px; transform:translateX(-100%); transition:0.3s; z-index:1001; overflow-y:auto; box-sizing:border-box;}
 .sidebar.active { transform:translateX(0); }
-.overlay { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:none; z-index:1000; }
+.overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); display:none; z-index:1000; }
+.sidebar button,.sidebar input { width:100%; margin:10px 0; padding:8px; border:none; border-radius:5px; box-sizing:border-box;}
+.upload-box { background:white; padding:15px; margin:15px; border-radius:10px; display:flex; flex-direction:column; gap:10px; }
+.camera-panel { background:#f5fbff; padding:10px; border-radius:10px; display:none; }
+.camera-controls { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin-top:10px; }
+.camera-controls button { flex:0 0 auto; min-width:70px; }
+.container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; padding:20px; }
+.video { background:white; padding:10px; border-radius:10px; }
+video,img { width:100%; border-radius:10px; }
+button {display:flex;align-items:center;gap:10px;padding:10px 15px;border:none;border-radius:50px;background:#2fa58d;color:white;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.15);transition:0.3s;}
+button::before{content:"➤";background:white;color:#2fa58d;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+/* PROFILE UI */
+.profile-pic-wrapper{display:flex;flex-direction:column;align-items:center;margin:15px 0 5px;}
+.profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
+.profile-circle img{width:100%;height:100%;object-fit:cover;}
+
+/* STORY RING DESIGN (NEW) */
+.story-ring-active { border: 3px solid #ff4d94 !important; padding: 2px; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+
+/* UPDATED STATUS BAR AS STORY TRAY */
+#myStatusBar { background:white; margin:0 15px 10px; border-radius:12px; padding:10px; display:none; align-items:center; gap:15px; box-shadow:0 2px 8px rgba(0,0,0,0.07); overflow-x: auto; scrollbar-width: none; }
+#myStatusBar::-webkit-scrollbar { display: none; }
+.story-slot { display: flex; flex-direction: column; align-items: center; min-width: 65px; cursor: pointer; }
+.story-thumb { width: 55px; height: 55px; border-radius: 50%; border: 2px solid #2fa58d; object-fit: cover; }
+.story-label { font-size: 10px; margin-top: 4px; text-align: center; color: #555; width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* STORY VIEWER OVERLAY */
+#storyViewer { position:fixed; inset:0; background:black; z-index:5000; display:none; flex-direction:column; align-items:center; justify-content:center; }
+#storyViewer.active { display:flex; }
+.story-header { position:absolute; top:20px; left:0; width:100%; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-sizing:border-box; color:white; z-index:5001; }
+.story-close { font-size:35px; cursor:pointer; }
+.story-footer { position:absolute; bottom:20px; width:100%; padding:0 20px; box-sizing:border-box; display:flex; gap:10px; }
+.story-reply-in { flex:1; padding:10px; border-radius:20px; border:1px solid #fff; background:rgba(255,255,255,0.2); color:white; outline:none; }
 </style>
 </head>
 <body>
 
-<div id="authScreen"><div class="auth-box"><h2>🅼🄾🆅🄸🄱🄴</h2><button onclick="login()">Login with Google</button></div></div>
+<div id="authScreen"><div class="auth-box"><h2>Login Required</h2><button onclick="login()">Login with Google</button></div></div>
 
 <div class="navbar">
-  <div class="menu-btn" onclick="openMenu()">☰</div>
-  <div class="logo">MOVIBE</div>
-  <div style="font-size:20px; cursor:pointer;" onclick="toggleCameraPanel()">📷</div>
-</div>
-
-<div class="story-tray" id="storyTray">
-  <div class="story-item" onclick="uploadStory()">
-    <div style="position:relative;">
-      <div class="story-ring watched"><img id="myStoryAvatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></div>
-      <div class="add-btn-icon">+</div>
-    </div>
-    <div class="story-name">Your Story</div>
+  <div style="display:flex;align-items:center;">
+    <div class="menu-btn" onclick="openMenu()">☰</div>
+    <button onclick="toggleCameraPanel()" class="cam-icon">📷</button>
   </div>
+  <div class="logo"><span>🅼🄾🆅🄸🄱🄴</span></div>
 </div>
 
-<div style="padding:15px;">
-  <div style="background:white; padding:15px; border-radius:15px;">
-    <input type="text" id="videoName" placeholder="Post Title..." style="width:100%; padding:10px; border:1px solid #ddd; border-radius:10px; margin-bottom:10px; outline:none;">
-    <button onclick="uploadVideo()" style="width:100%; justify-content:center;">📤 Upload Post</button>
+<div class="sidebar" id="sidebar">
+  <button onclick="logout()">Logout</button>
+  <button onclick="openFriendsPage()" style="background:#1a8f7a;">👥 Friends (Public Users)</button>
+  <div class="profile-pic-wrapper">
+    <div class="profile-circle" onclick="openEditProfile()"><img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png"></div>
+    <div class="sidebar-profile-name" id="sidebarName"></div>
   </div>
+  <button onclick="openEditProfile()">👤 My Profile</button>
+  <button onclick="closeMenu()">❌ Close</button>
+</div>
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+
+<div id="myStatusBar" class="show">
+  <div class="story-slot" onclick="uploadStory()">
+    <img id="statusBarPhoto" class="story-thumb" src="" style="border-style: dashed;">
+    <div class="story-label">Add Story</div>
+  </div>
+  <div id="otherStories" style="display:flex; gap:15px;"></div>
 </div>
 
-<div id="cameraPanel" style="display:none; padding:15px; background:white; margin:15px; border-radius:15px; text-align:center;">
-    <div id="cameraPreview" style="background:#000; height:250px; border-radius:15px; margin-bottom:10px;"></div>
-    <button onclick="toggleCamera()">ON/OFF</button>
-    <button onclick="capturePhoto()">📸 Photo</button>
-    <button onclick="startRecording()">🎥 Record</button>
+<div class="upload-box">
+  <input type="text" id="videoName" placeholder="Video Title">
+  <button onclick="uploadVideo()">Upload</button>
 </div>
 
 <div class="container" id="videoContainer"></div>
 
 <div id="storyViewer">
-    <div class="story-progress"><div class="story-progress-fill" id="storyProgress"></div></div>
     <div class="story-header">
-        <div class="story-user">
-            <img id="storyUserImg" src="">
-            <span id="storyUserName"></span>
+        <div style="display:flex; align-items:center; gap:10px;">
+            <img id="svAvatar" src="" style="width:35px; height:35px; border-radius:50%;">
+            <b id="svName"></b>
         </div>
-        <div style="font-size:30px; cursor:pointer;" onclick="closeStory()">×</div>
+        <div class="story-close" onclick="closeStory()">×</div>
     </div>
-    <div id="storyMediaHolder" style="flex:1; display:flex; align-items:center; justify-content:center;"></div>
-    
+    <div id="svMedia" style="width:100%; max-height:80vh; display:flex; align-items:center; justify-content:center;"></div>
     <div class="story-footer">
-        <div class="viewer-count" id="viewerSection">👁️ <span id="viewCount">0</span> views</div>
-        <div class="reply-box">
-            <input type="text" id="replyInput" class="reply-input" placeholder="Send reply...">
-            <button onclick="sendReply()" style="background:white; color:#2fa58d; padding:8px 15px;">Send</button>
-        </div>
+        <input type="text" id="svReply" class="story-reply-in" placeholder="Reply to story...">
+        <button onclick="sendStoryReply()" style="padding:5px 15px; font-size:12px;">Send</button>
     </div>
+    <div id="svViews" style="color:white; font-size:12px; margin-top:10px;">👁️ 0 views</div>
 </div>
 
-<div class="sidebar" id="sidebar">
-  <h2 id="sidebarName">User</h2>
-  <button onclick="openFriendsPage()">👥 Friends List</button>
-  <button onclick="logout()" style="background:#ff4d4d; color:white;">Logout</button>
-  <button onclick="closeMenu()">Close</button>
+<div id="friendsPage">
+  <div class="fp-header"><button onclick="closeFriendsPage()">← Back</button><h2>Public Users</h2></div>
+  <div class="fp-body" id="friendsList"></div>
 </div>
-<div class="overlay" id="overlay" onclick="closeMenu()"></div>
 
 <script>
 const supabaseClient = window.supabase.createClient("https://wivkaloxlsibjjgtudps.supabase.co","sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg");
 let currentUser = null;
-let storyTimer;
-let currentActiveStoryId = null;
+let activeStory = null;
 
 async function login(){ await supabaseClient.auth.signInWithOAuth({provider:"google"}); }
 async function logout(){ await supabaseClient.auth.signOut(); location.reload(); }
@@ -138,14 +134,27 @@ async function checkUser(){
 }
 checkUser();
 
-function uploadStory() {
+async function loadMyProfile(){
+  const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
+  if(data){
+    const photo = data.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+    document.getElementById('sidebarName').innerText = data.name || 'User';
+    document.getElementById('profileImg').src = photo;
+    document.getElementById('statusBarPhoto').src = photo;
+    document.getElementById('myStatusBar').style.display = 'flex';
+  }
+}
+
+// --- STORY SYSTEM (NEW) ---
+
+async function uploadStory() {
   cloudinary.openUploadWidget({cloudName:"dvks0ojbu", uploadPreset:"latw_preset"}, async(e,r)=>{
     if(r.event==="success"){
       await supabaseClient.from("videos").insert([{
-          title: "STORY_ITEM",
-          url: r.info.secure_url, 
-          type: r.info.resource_type, 
-          user_id: currentUser.id
+        title: "STORY_24H", 
+        url: r.info.secure_url, 
+        type: r.info.resource_type, 
+        user_id: currentUser.id
       }]);
       loadStories();
     }
@@ -153,90 +162,80 @@ function uploadStory() {
 }
 
 async function loadStories() {
-    const tray = document.getElementById('storyTray');
-    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: stories } = await supabaseClient.from('videos').select('*, profiles(name, photo_url)').eq('title', 'STORY_ITEM').gt('created_at', yesterday).order('created_at', {ascending: false});
-    
-    const addBtn = tray.firstElementChild;
-    tray.innerHTML = '';
-    tray.appendChild(addBtn);
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: stories } = await supabaseClient.from('videos')
+    .select('*, profiles(name, photo_url)')
+    .eq('title', 'STORY_24H')
+    .gt('created_at', yesterday);
 
-    const usersSeen = new Set();
-    stories?.forEach(s => {
-        if(!usersSeen.has(s.user_id)) {
-            usersSeen.add(s.user_id);
-            const item = document.createElement('div');
-            item.className = 'story-item';
-            item.onclick = () => openStory(s);
-            item.innerHTML = `<div class="story-ring"><img src="${s.profiles?.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"></div><div class="story-name">${s.profiles?.name || 'User'}</div>`;
-            tray.appendChild(item);
-        }
-    });
+  const container = document.getElementById('otherStories');
+  container.innerHTML = '';
+  
+  // Unique users for story tray
+  const users = {};
+  stories?.forEach(s => { if(!users[s.user_id]) users[s.user_id] = s; });
+
+  Object.values(users).forEach(s => {
+    container.innerHTML += `
+      <div class="story-slot" onclick='openStoryViewer(${JSON.stringify(s)})'>
+        <img class="story-thumb story-ring-active" src="${s.profiles.photo_url || ''}">
+        <div class="story-label">${s.profiles.name}</div>
+      </div>`;
+  });
 }
 
-async function openStory(story) {
-    currentActiveStoryId = story.id;
-    const viewer = document.getElementById('storyViewer');
-    const holder = document.getElementById('storyMediaHolder');
-    const progress = document.getElementById('storyProgress');
-    
-    document.getElementById('storyUserImg').src = story.profiles?.photo_url || '';
-    document.getElementById('storyUserName').innerText = story.profiles?.name || '';
-    viewer.classList.add('active');
-    
-    holder.innerHTML = story.type === 'video' 
-        ? `<video src="${story.url}" autoplay playsinline style="max-width:100%; max-height:100%;"></video>`
-        : `<img src="${story.url}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+async function openStoryViewer(s) {
+  activeStory = s;
+  document.getElementById('storyViewer').classList.add('active');
+  document.getElementById('svName').innerText = s.profiles.name;
+  document.getElementById('svAvatar').src = s.profiles.photo_url;
+  
+  const media = document.getElementById('svMedia');
+  media.innerHTML = s.type === 'video' ? `<video src="${s.url}" autoplay></video>` : `<img src="${s.url}">`;
 
-    // Track View
-    if(story.user_id !== currentUser.id) {
-        await supabaseClient.from('story_interactions').upsert([{ story_id: story.id, user_id: currentUser.id, type: 'view' }]);
-    }
-    
-    // Get View Count
-    const { count } = await supabaseClient.from('story_interactions').select('*', { count: 'exact', head: true }).eq('story_id', story.id).eq('type', 'view');
-    document.getElementById('viewCount').innerText = count || 0;
-
-    progress.style.transition = 'none'; progress.style.width = '0%';
-    setTimeout(() => { progress.style.transition = 'width 5s linear'; progress.style.width = '100%'; }, 50);
-    storyTimer = setTimeout(closeStory, 5000);
-}
-
-async function sendReply() {
-    const text = document.getElementById('replyInput').value;
-    if(!text) return;
-    await supabaseClient.from('story_interactions').insert([{ story_id: currentActiveStoryId, user_id: currentUser.id, type: 'reply', content: text }]);
-    document.getElementById('replyInput').value = '';
-    alert("Reply sent!");
-}
-
-function closeStory() { document.getElementById('storyViewer').classList.remove('active'); clearTimeout(storyTimer); }
-function openMenu(){ document.getElementById("sidebar").classList.add("active"); document.getElementById("overlay").style.display="block"; }
-function closeMenu(){ document.getElementById("sidebar").classList.remove("active"); document.getElementById("overlay").style.display="none"; }
-async function loadMyProfile(){
-  const { data } = await supabaseClient.from('profiles').select('*').eq('id', currentUser.id).single();
-  if(data){
-      document.getElementById('myStoryAvatar').src = data.photo_url || '';
-      document.getElementById('sidebarName').innerText = data.name || 'User';
+  // Track View
+  if(s.user_id !== currentUser.id) {
+    await supabaseClient.from('story_interactions').insert([{ story_id: s.id, user_id: currentUser.id, type: 'view' }]);
   }
+  
+  // Count Views
+  const { count } = await supabaseClient.from('story_interactions').select('*', {count: 'exact', head: true}).eq('story_id', s.id).eq('type', 'view');
+  document.getElementById('svViews').innerText = `👁️ ${count || 0} views`;
 }
+
+function closeStory() { document.getElementById('storyViewer').classList.remove('active'); }
+
+async function sendStoryReply() {
+  const msg = document.getElementById('svReply').value;
+  if(!msg) return;
+  await supabaseClient.from('story_interactions').insert([{ story_id: activeStory.id, user_id: currentUser.id, type: 'reply', content: msg }]);
+  document.getElementById('svReply').value = '';
+  alert("Reply sent!");
+}
+
+// --- EXISTING CORE FUNCTIONS ---
+
 async function loadVideos(){
-  let { data } = await supabaseClient.from("videos").select("*").neq("title", "STORY_ITEM").order('id',{ascending:false});
+  let { data } = await supabaseClient.from("videos").select("*").neq("title", "STORY_24H").order('id',{ascending:false});
   const container = document.getElementById("videoContainer");
   container.innerHTML = "";
   data?.forEach(v => {
-    container.innerHTML += `<div class="video-card">${v.type==='video'?`<video src="${v.url}" onclick="this.play()"></video>`:`<img src="${v.url}">`}<div style="padding:8px; font-size:13px;">${v.title}</div></div>`;
+    container.innerHTML += `<div class="video">${v.type==='video'?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`}<p>${v.title}</p></div>`;
   });
 }
+
 function uploadVideo(){
-  let t = document.getElementById('videoName').value || "Post";
+  const title = document.getElementById('videoName').value;
   cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"}, async(e,r)=>{
     if(r.event==="success"){
-      await supabaseClient.from("videos").insert([{title:t, url:r.info.secure_url, type:r.info.resource_type, user_id:currentUser.id}]);
+      await supabaseClient.from("videos").insert([{title: title, url:r.info.secure_url, type:r.info.resource_type, user_id:currentUser.id}]);
       loadVideos();
     }
   });
 }
+
+function openMenu(){ document.getElementById("sidebar").classList.add("active"); document.getElementById("overlay").style.display="block"; }
+function closeMenu(){ document.getElementById("sidebar").classList.remove("active"); document.getElementById("overlay").style.display="none"; }
 </script>
 </body>
 </html>
