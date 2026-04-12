@@ -24,35 +24,22 @@ body { margin:0; font-family:Arial; background:#e6f2ff; }
 .camera-controls { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:8px; margin-top:10px; }              
 .camera-controls button { flex:0 0 auto; min-width:70px; }              
 .container { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; padding:20px; }              
-.video { background:white; padding:10px; border-radius:10px; min-height: 200px; }              
-video,img { width:100%; border-radius:10px; display: block; background: #000; }              
+.video { background:white; padding:10px; border-radius:10px; }              
+video,img { width:100%; border-radius:10px; }              
 button {display:flex;align-items:center;gap:10px;padding:10px 15px;border:none;border-radius:50px;background:#2fa58d;color:white;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.15);transition:0.3s;}  
 button::before{content:"➤";background:white;color:#2fa58d;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}  
 button:hover{background:#248f79;transform:scale(1.05);}  
 button:active{transform:scale(0.95);}
-
-/* SIDEBAR PROFILE */
 .profile-pic-wrapper{display:flex;flex-direction:column;align-items:center;margin:15px 0 5px;}
 .profile-circle{width:75px;height:75px;border-radius:50%;overflow:hidden;cursor:pointer;border:3px solid white;box-shadow:0 2px 10px rgba(0,0,0,0.25);background:#ddd;}
 .profile-circle img{width:100%;height:100%;object-fit:cover;}
 .profile-label{color:white;font-size:11px;margin-top:5px;}
-.sidebar-profile-name{color:white;font-size:14px;font-weight:700;margin-top:4px;text-align:center;word-break:break-word;}
-
-/* PUBLIC PROFILE CARD */
-#publicProfileCard{background:white;margin:15px;border-radius:14px;padding:16px 18px;display:none;align-items:center;gap:14px;box-shadow:0 2px 10px rgba(0,0,0,0.08);}
-#publicProfileCard.show{display:flex;}
-.pub-avatar{width:56px;height:56px;min-width:56px;border-radius:50%;overflow:hidden;border:2px solid #2fa58d;}
-.pub-avatar img{width:100%;height:100%;object-fit:cover;}
-.pub-name{font-size:16px;font-weight:800;color:#1a3c34;margin:0 0 2px;}
-.pub-username{font-size:12px;color:#2fa58d;margin:0 0 3px;}
-.pub-bio{font-size:12px;color:#555;margin:0;}
-
-/* EDIT PROFILE PAGE */
 #editProfilePage{position:fixed;inset:0;z-index:2000;background:#b0dcea;display:none;flex-direction:column;}
 #editProfilePage.active{display:flex;}
 .ep-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid rgba(0,0,0,0.1);background:#b0dcea;}
 .ep-cancel,.ep-done{background:none !important;border:none !important;font-size:16px !important;cursor:pointer;font-weight:700;color:#2fa58d !important;box-shadow:none !important;padding:6px 10px !important;width:auto !important;margin:0 !important;}
 .ep-cancel::before,.ep-done::before{display:none !important;}
+.ep-cancel:hover,.ep-done:hover{background:none !important;transform:none !important;}
 .ep-header h2{font-size:18px;font-weight:800;color:#1a3c34;margin:0;}
 .ep-body{flex:1;overflow-y:auto;padding:20px;}
 .ep-photo-section{text-align:center;margin-bottom:24px;}
@@ -69,6 +56,7 @@ button:active{transform:scale(0.95);}
 .ep-field-inner textarea{resize:none;min-height:40px;}
 .ep-big-btn{display:flex !important;justify-content:space-between;align-items:center;background:#c5e8dc !important;border-radius:14px !important;padding:14px 16px !important;margin-bottom:10px;cursor:pointer;border:none;width:100%;box-sizing:border-box;}
 .ep-big-btn::before{display:none !important;}
+.ep-big-btn:hover{background:#b5ddd0 !important;transform:none !important;}
 .ep-big-btn-left{display:flex;align-items:center;gap:12px;}
 .ep-big-btn-icon{width:36px;height:36px;min-width:36px;background:#2fa58d;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
 .ep-big-btn-text{font-size:14px;font-weight:700;color:#1a3c34;}
@@ -110,24 +98,11 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
       <img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
     </div>
     <small class="profile-label">Tap to change photo</small>
-    <div class="sidebar-profile-name" id="sidebarName"></div>
   </div>
   <button onclick="openEditProfile()">👤 My Profile</button>
 </div>
 
 <div class="overlay" id="overlay" onclick="closeMenu()"></div>              
-
-<div id="publicProfileCard">
-  <div class="pub-avatar">
-    <img id="pubCardPhoto" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
-  </div>
-  <div class="pub-info">
-    <p class="pub-name" id="pubCardName"></p>
-    <p class="pub-username" id="pubCardUsername"></p>
-    <p class="pub-bio" id="pubCardBio"></p>
-  </div>
-</div>
-
 <div class="upload-box">              
 <input type="text" id="videoName" placeholder="Video Name">              
 <button onclick="uploadVideo()">Upload</button>              
@@ -178,19 +153,46 @@ if(/Instagram|FBAN|FBAV|WhatsApp|wv/.test(navigator.userAgent)){
       </div>
     </div>
     <div class="ep-field">
+      <div class="ep-field-icon" style="font-size:12px;">PR</div>
+      <div class="ep-field-inner">
+        <label>Pronouns</label>
+        <input type="text" id="epPronouns" placeholder="he/him, she/her...">
+      </div>
+    </div>
+    <div class="ep-field">
+      <div class="ep-field-icon">🔗</div>
+      <div class="ep-field-inner">
+        <label>Website</label>
+        <input type="url" id="epWebsite" placeholder="https://yourwebsite.com">
+      </div>
+    </div>
+    <div class="ep-field">
       <div class="ep-field-icon">✏️</div>
       <div class="ep-field-inner">
         <label>Bio</label>
         <textarea id="epBio" placeholder="Tell something about you..."></textarea>
       </div>
     </div>
+    <button class="ep-big-btn">
+      <div class="ep-big-btn-left">
+        <div class="ep-big-btn-icon">👑</div>
+        <span class="ep-big-btn-text">Switch to Professional Account</span>
+      </div>
+      <span class="ep-arrow">›</span>
+    </button>
+    <button class="ep-big-btn">
+      <div class="ep-big-btn-left">
+        <div class="ep-big-btn-icon">🛡️</div>
+        <span class="ep-big-btn-text">Personal Information Settings</span>
+      </div>
+      <span class="ep-arrow">›</span>
+    </button>
   </div>
 </div>
 
 <div class="saved-toast" id="savedToast">✅ Profile Saved!</div>
 
 <script>              
-const supabaseClient = window.supabase.createClient("https://wivkaloxlsibjjgtudps.supabase.co","sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg");
 const sidebar=document.getElementById("sidebar");
 const overlay=document.getElementById("overlay");
 const videoContainer=document.getElementById("videoContainer");
@@ -199,176 +201,96 @@ function openMenu(){sidebar.classList.add("active");overlay.style.display="block
 function closeMenu(){sidebar.classList.remove("active");overlay.style.display="none";}
 function toggleCameraPanel(){let panel=document.getElementById("cameraPanel");panel.style.display=panel.style.display==="none"?"block":"none";}
 
-// AUTH FUNCTIONS
-async function login(){
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider:"google",
-    options:{ redirectTo: window.location.origin + window.location.pathname }
-  });
-  if(error) alert(error.message);
-}
+const supabaseClient=window.supabase.createClient("https://wivkaloxlsibjjgtudps.supabase.co","sb_publishable_zmNRS5kVltxDXPikLvE3ag_Mj1sCOqg");
 
+async function login(){await supabaseClient.auth.signInWithOAuth({provider:"google",options:{redirectTo:"https://mauntanhills-beep.github.io/movibe"}});}
 async function logout(){await supabaseClient.auth.signOut();location.reload();}
-
-async function checkUser(){
-  const {data:{user}} = await supabaseClient.auth.getUser();
-  if(user){
-    document.getElementById("authScreen").style.display="none";
-    document.getElementById("userInfo").innerText=user.email;
-    loadVideos();
-    loadProfilePhoto();
-  } else {
-    document.getElementById("authScreen").style.display="flex";
-  }
-}
+async function checkUser(){const{data}=await supabaseClient.auth.getUser();if(data.user){document.getElementById("authScreen").style.display="none";document.getElementById("userInfo").innerText=data.user.email;loadVideos();loadProfilePhoto();}else{document.getElementById("authScreen").style.display="flex";}}
 checkUser();
 
 function addShop(){let link=document.getElementById("shopLink").value.trim();if(!link)return;if(!link.startsWith("http"))link="https://"+link;let preview=`https://api.microlink.io/?url=${link}`;videoContainer.innerHTML+=`<div class="video"><img src="${preview}"><p>${link}</p><a href="${link}" target="_blank"><button>Open</button></a></div>`;}
 
-// CAMERA LOGIC
 let cameraStream=null;let mediaRecorder;let recordedChunks=[];let currentFacing="user";let flashOn=false;let micOn=false;
-
-async function toggleCamera(){
-  let preview=document.getElementById("cameraPreview");
-  if(!cameraStream){
-    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:currentFacing}});
-    let v=document.createElement("video");v.id="liveCamera";v.srcObject=cameraStream;v.autoplay=true;
-    preview.innerHTML="";preview.appendChild(v);
-  } else {
-    cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;preview.innerHTML="";
-  }
-}
-
+async function toggleCamera(){let preview=document.getElementById("cameraPreview");if(!cameraStream){cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:currentFacing}});let v=document.createElement("video");v.id="liveCamera";v.srcObject=cameraStream;v.autoplay=true;preview.innerHTML="";preview.appendChild(v);}else{cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;preview.innerHTML="";}}
 async function switchCamera(){currentFacing=currentFacing==="user"?"environment":"user";if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;toggleCamera();}}
-
-async function toggleFlash(){
-  if(!cameraStream) return alert("Camera ON karo");
-  let track=cameraStream.getVideoTracks()[0];
-  flashOn=!flashOn;
-  try{await track.applyConstraints({advanced:[{torch:flashOn}]});}catch(e){alert("Flash support nahi hai");}
-}
-
+async function toggleFlash(){if(!cameraStream)return alert("Camera ON karo");let track=cameraStream.getVideoTracks()[0];let cap=track.getCapabilities();if(!cap.torch){return alert("Flash support nahi hai");}flashOn=!flashOn;await track.applyConstraints({advanced:[{torch:flashOn}]});}
 function toggleMic(){micOn=!micOn;document.getElementById("micBtn").innerText=micOn?"🎤 Mic ON":"🎤 Mic OFF";}
-
-async function capturePhoto(){
-  if(!cameraStream) return alert("Camera ON karo");
-  let video=document.getElementById("liveCamera");
-  let canvas=document.createElement("canvas");
-  canvas.width=video.videoWidth;canvas.height=video.videoHeight;
-  canvas.getContext("2d").drawImage(video,0,0);
-  let blob=await(await fetch(canvas.toDataURL())).blob();
-  let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");
-  let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});
-  let data=await res.json();
-  await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image"}]);
-  loadVideos();
-}
-
-function startRecording(){
-  if(!cameraStream) return alert("Camera ON karo");
-  recordedChunks=[];mediaRecorder=new MediaRecorder(cameraStream);
-  mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};
-  mediaRecorder.onstop=async()=>{
-    let blob=new Blob(recordedChunks,{type:"video/webm"});
-    let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");
-    let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});
-    let data=await res.json();
-    await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video"}]);
-    loadVideos();
-  };
-  mediaRecorder.start();
-}
-
+async function capturePhoto(){if(!cameraStream)return alert("Camera ON karo");let video=document.getElementById("liveCamera");let canvas=document.createElement("canvas");canvas.width=video.videoWidth;canvas.height=video.videoHeight;canvas.getContext("2d").drawImage(video,0,0);let blob=await(await fetch(canvas.toDataURL())).blob();let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});let data=await res.json();await supabaseClient.from("videos").insert([{title:"Camera Photo",url:data.secure_url,type:"image"}]);loadVideos();}
+function startRecording(){if(!cameraStream)return alert("Camera ON karo");recordedChunks=[];mediaRecorder=new MediaRecorder(cameraStream);mediaRecorder.ondataavailable=e=>{if(e.data.size>0)recordedChunks.push(e.data);};mediaRecorder.onstop=async()=>{let blob=new Blob(recordedChunks,{type:"video/webm"});let fd=new FormData();fd.append("file",blob);fd.append("upload_preset","latw_preset");let res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/video/upload",{method:"POST",body:fd});let data=await res.json();await supabaseClient.from("videos").insert([{title:"Camera Video",url:data.secure_url,type:"video"}]);loadVideos();};mediaRecorder.start();alert("Recording start");}
 function stopRecording(){if(mediaRecorder){mediaRecorder.stop();alert("Uploading...");}}
+function uploadVideo(){let name=document.getElementById("videoName").value;cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);loadVideos();}});}
+async function loadVideos(){let{data}=await supabaseClient.from("videos").select("*");videoContainer.innerHTML="";data.forEach(v=>{let media=v.type==="video"?`<video controls src="${v.url}"></video>`:`<img src="${v.url}">`;videoContainer.innerHTML+=`<div class="video">${media}<p>${v.title}</p></div>`;});}
 
-function uploadVideo(){
-  let name=document.getElementById("videoName").value;
-  cloudinary.openUploadWidget({cloudName:"dvks0ojbu",uploadPreset:"latw_preset"},async(e,r)=>{
-    if(r&&r.event==="success"){await supabaseClient.from("videos").insert([{title:name,url:r.info.secure_url,type:r.info.resource_type}]);loadVideos();}
-  });
-}
+// ── PROFILE — SUPABASE ──
+let currentPhotoBase64=null;
 
-// OPTIMIZED LOAD VIDEOS
-async function loadVideos(){
-  let{data}=await supabaseClient.from("videos").select("*").order('created_at', { ascending: false });
-  if(data){
-    videoContainer.innerHTML="";
-    data.forEach(v=>{
-      // Cloudinary Auto Optimization: Quality and Format
-      let optimizedUrl = v.url;
-      if(v.url.includes("cloudinary.com")) {
-          optimizedUrl = v.url.replace("/upload/", "/upload/q_auto,f_auto/");
-      }
-      
-      let media;
-      if(v.type === "video") {
-          media = `<video controls preload="metadata" loading="lazy" src="${optimizedUrl}"></video>`;
-      } else {
-          media = `<img loading="lazy" src="${optimizedUrl}">`;
-      }
-      videoContainer.innerHTML += `<div class="video">${media}<p>${v.title}</p></div>`;
-    });
-  }
-}
-
-// PROFILE LOGIC
 async function loadProfilePhoto(){
-  const {data:{user}} = await supabaseClient.auth.getUser();
-  if(!user) return;
-  const {data} = await supabaseClient.from('profiles').select('*').eq('id',user.id).single();
-  if(data){
-    if(data.photo_url){
-      document.getElementById('profileImg').src=data.photo_url;
-      document.getElementById('epAvatarImg').src=data.photo_url;
-      document.getElementById('pubCardPhoto').src=data.photo_url;
-    }
-    document.getElementById('sidebarName').innerText=data.name || 'User';
-    document.getElementById('pubCardName').innerText=data.name || '';
-    document.getElementById('pubCardUsername').innerText=data.username ? '@'+data.username : '';
-    document.getElementById('pubCardBio').innerText=data.bio || '';
-    if(data.name || data.username) document.getElementById('publicProfileCard').classList.add('show');
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  const{data}=await supabaseClient.from('profiles').select('photo_url').eq('id',userData.user.id).single();
+  if(data&&data.photo_url){
+    document.getElementById('profileImg').src=data.photo_url;
+    document.getElementById('epAvatarImg').src=data.photo_url;
   }
 }
 
-function openEditProfile(){
+async function openEditProfile(){
   closeMenu();
   document.getElementById('editProfilePage').classList.add('active');
-  fillFields();
-}
-
-async function fillFields(){
-  const {data:{user}} = await supabaseClient.auth.getUser();
-  const {data} = await supabaseClient.from('profiles').select('*').eq('id',user.id).single();
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  const{data}=await supabaseClient.from('profiles').select('*').eq('id',userData.user.id).single();
   if(data){
     document.getElementById('epName').value=data.name||'';
     document.getElementById('epUsername').value=data.username||'';
+    document.getElementById('epPronouns').value=data.pronouns||'';
+    document.getElementById('epWebsite').value=data.website||'';
     document.getElementById('epBio').value=data.bio||'';
+    if(data.photo_url){
+      document.getElementById('epAvatarImg').src=data.photo_url;
+      document.getElementById('profileImg').src=data.photo_url;
+    }
   }
 }
 
-function closeEditProfile(){document.getElementById('editProfilePage').classList.remove('active');}
+function closeEditProfile(){
+  document.getElementById('editProfilePage').classList.remove('active');
+}
+
+function handleEpPhoto(event){
+  const file=event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    currentPhotoBase64=e.target.result;
+    document.getElementById('epAvatarImg').src=e.target.result;
+    document.getElementById('profileImg').src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 async function saveProfile(){
-  const {data:{user}} = await supabaseClient.auth.getUser();
-  const updates = {
-    id: user.id,
-    name: document.getElementById('epName').value,
-    username: document.getElementById('epUsername').value,
-    bio: document.getElementById('epBio').value,
-    updated_at: new Date()
-  };
-  const {error} = await supabaseClient.from('profiles').upsert(updates);
-  if(!error){
-    document.getElementById('savedToast').classList.add('show');
-    setTimeout(()=>document.getElementById('savedToast').classList.remove('show'),2000);
-    loadProfilePhoto();
-    closeEditProfile();
+  const{data:userData}=await supabaseClient.auth.getUser();
+  if(!userData.user)return;
+  let photo_url=null;
+  if(currentPhotoBase64){
+    const fd=new FormData();
+    fd.append('file',currentPhotoBase64);
+    fd.append('upload_preset','latw_preset');
+    const res=await fetch('https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload',{method:'POST',body:fd});
+    const d=await res.json();
+    photo_url=d.secure_url;
   }
+  const updates={id:userData.user.id,name:document.getElementById('epName').value,username:document.getElementById('epUsername').value,pronouns:document.getElementById('epPronouns').value,website:document.getElementById('epWebsite').value,bio:document.getElementById('epBio').value,updated_at:new Date().toISOString()};
+  if(photo_url){updates.photo_url=photo_url;document.getElementById('profileImg').src=photo_url;document.getElementById('epAvatarImg').src=photo_url;}
+  const{error}=await supabaseClient.from('profiles').upsert(updates);
+  if(error){alert('Error: '+error.message);return;}
+  currentPhotoBase64=null;
+  const toast=document.getElementById('savedToast');
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2500);
+  closeEditProfile();
 }
-
-async function handleEpPhoto(event){
-  const file=event.target.files[0];
-  if(!file) return;
-  const fd=new FormData(); fd.append("file",file); fd.append("upload_preset","latw_preset");
-  const res=await fetch("https://api.cloudinary.com/v1_1/dvks0ojbu/image/upload",{method:"POST",body:fd});
-  const imgData=await res.json(
+</script>              
+</body>              
+  </html>
